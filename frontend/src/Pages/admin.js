@@ -24,7 +24,6 @@ const CouponPage = () => {
           }
         });
         setCoupons(response.data.data);
-        console.log(response.data);
       } catch (error) {
         console.error('Error fetching coupons:', error);
       }
