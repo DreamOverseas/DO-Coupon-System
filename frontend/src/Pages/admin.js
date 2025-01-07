@@ -73,7 +73,6 @@ const CouponPage = () => {
 
   // Handle QR Code download
   const handleDownloadQR = async (hash, title) => {
-    console.log(`${title} Hash: ${hash}`);
     try {
       const qrCodeDataURL = await QRCode.toDataURL(hash);
       const link = document.createElement('a');
@@ -89,7 +88,10 @@ const CouponPage = () => {
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-white shadow p-4 flex items-center justify-between">
-        <img src="/logo512.png" alt="Logo" className="w-12 h-12" />
+        <div className="flex items-center gap-4">
+          <img src="/logo512.png" alt="Logo" className="w-12 h-12" />
+          <h1 className="text-xl font-bold">DO Coupon System</h1>
+        </div>
         <div className="flex gap-4">
           {/* Search */}
           <input
@@ -129,6 +131,14 @@ const CouponPage = () => {
             </button>
           </div>
         </div>
+        <a
+          href="https://api.do360.com/admin/content-manager/collection-types/api::coupon.coupon/create"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-black text-white px-4 py-2 rounded"
+        >
+          New/新增
+        </a>
       </header>
 
       {/* Coupons */}
