@@ -8,10 +8,9 @@ require('dotenv').config();
 app.use(cors());
 app.use(bodyParser.json());
 
-const STRAPI_API = process.env.STRAPI_API; // Strapi API 端口
-const STRAPI_KEY = process.env.STRAPI_KEY; // Strapi API Token
+const STRAPI_API = process.env.STRAPI_API;
+const STRAPI_KEY = process.env.STRAPI_KEY;
 
-// 获取所有优惠券
 const getAllCoupons = async () => {
   try {
     const response = await axios.get(`${STRAPI_API}/coupons`, {
@@ -19,17 +18,22 @@ const getAllCoupons = async () => {
     });
     return response.data.data;
   } catch (error) {
-    console.error('[Server]获取优惠券失败:', error);
-    throw new Error('[Server]无法获取优惠券数据');
+    console.error('获取优惠券失败:', error);
+    throw new Error('无法获取优惠券数据');
   }
 };
 
-// 验证优惠券
+/**
+ * This is the API designed or the Coupon System frontend, to validate Coupon by its Hash code
+ * @params hash -> the hash value for validation check
+ * @returns status -> the status of recorded coupon with that Hash, 'invalid' for hash not found
+ * @returns message -> Chinese explation for the status and for viewing in frontend
+ */
 app.post('/validate-coupon', async (req, res) => {
   const { hash } = req.body;
 
   if (!hash) {
-    return res.status(400).json({ status: 'invalid', message: '[Server]无效请求' });
+    return res.status(400).json({ status: 'invalid', message: '无效请求' });
   }
 
   try {
@@ -39,39 +43,43 @@ app.post('/validate-coupon', async (req, res) => {
     console.log(coupons);
 
     if (!coupon) {
-      return res.status(404).json({ status: 'invalid', message: '[Server]无效二维码' });
+      return res.status(404).json({ status: 'invalid', message: '无效二维码' });
     }
 
     if (!coupon.Active) {
-      return res.json({ status: 'inactive', message: '[Server]优惠券已失效' });
+      return res.json({ status: 'inactive', message: '优惠券已失效' });
     }
 
     if (new Date(coupon.Expiry) < new Date()) {
-      return res.json({ status: 'expired', message: '[Server]优惠券已过期' });
+      return res.json({ status: 'expired', message: '优惠券已过期' });
     }
 
     if (coupon.UsesLeft <= 0) {
-      return res.json({ status: 'used', message: '[Server]优惠券已使用完毕' });
+      return res.json({ status: 'used', message: '优惠券已使用完毕' });
     }
 
     res.json({
       status: 'valid',
-      message: '[Server]优惠券有效',
+      message: '[优惠券有效',
       title: coupon.Title,
       description: coupon.Description,
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ status: 'error', message: '[Server]服务器错误' });
+    res.status(500).json({ status: 'error', message: '服务器错误' });
   }
 });
 
-// 确认使用优惠券
+/**
+ * This is the API designed or the Coupon System frontend, to use Coupon by its Hash code from the provider's QR scan
+ * @params hash -> the hash value for use
+ * @returns message -> Chinese explation for the successful or not and for viewing in frontend
+ */
 app.post('/use-coupon', async (req, res) => {
   const { hash } = req.body;
 
   if (!hash) {
-    return res.status(400).json({ message: '[Server]无效二维码' });
+    return res.status(400).json({ message: '无效二维码' });
   }
 
   try {
@@ -79,17 +87,16 @@ app.post('/use-coupon', async (req, res) => {
     const couponData = coupons.find((item) => item.Hash === hash);
 
     if (!couponData) {
-      return res.status(404).json({ message: '[Server]无效二维码' });
+      return res.status(404).json({ message: '无效二维码' });
     }
 
     console.log(`Coupon Found with ID ${couponData.documentId}: `, couponData);
 
-    const couponId = couponData.documentId; // 获取优惠券 ID
+    const couponId = couponData.documentId;
     const coupon = couponData;
 
     const updatedUsesLeft = coupon.UsesLeft - 1;
 
-    // 更新优惠券信息
     await axios.put(
       `${STRAPI_API}/coupons/${couponId}`,
       {
@@ -103,13 +110,13 @@ app.post('/use-coupon', async (req, res) => {
       }
     );
 
-    res.json({ message: '[Server]优惠券使用成功！' });
+    res.json({ message: '优惠券使用成功！' });
   } catch (error) {
-    res.status(500).json({ message: '[Server]服务器错误' });
+    res.status(500).json({ message: '服务器错误' });
   }
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3003;
 app.listen(PORT, () => {
   console.log(`Server is up and running on port ${PORT}`);
 });
