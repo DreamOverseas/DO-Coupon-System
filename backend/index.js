@@ -11,6 +11,7 @@ app.use(bodyParser.json());
 const STRAPI_API = process.env.STRAPI_API;
 const STRAPI_KEY = process.env.STRAPI_KEY;
 
+// Function that get all coupons from backend
 const getAllCoupons = async () => {
   try {
     const response = await axios.get(`${STRAPI_API}/coupons`, {
@@ -22,6 +23,65 @@ const getAllCoupons = async () => {
     throw new Error('无法获取优惠券数据');
   }
 };
+
+// Function that formats and produce success logs
+const logSuccess = (statusCode, message) => {
+  console.log(`[CouponSys - ${statusCode} OK] ${message}.`);
+}
+
+/**
+ * This is the API designed or the Coupon System frontend main page login
+ * @params name -> the name for login
+ * @params password -> the password to check match
+ * @returns role -> the role of the login user if logged in successfully, 'none' for failure
+ * @returns message -> Chinese explation for the status and for viewing in frontend
+ */
+app.post('/login', async (req, res) => {
+  const {name, password} = req.body;
+
+  if (!name || !password){
+    return res.status(400).json({ role: 'none', message: 'Name/Password are both nessesary.' });
+  }
+  
+  try {
+    // Query Strapi for the account by name
+    const response = await axios.get(`${STRAPI_API}/coupon-sys-accounts`, {
+      headers: {
+        Authorization: `Bearer ${STRAPI_KEY}`
+      },
+      params: {
+        filters: {
+          Name: {
+            $eq: name
+          }
+        }
+      }
+    });
+
+    const accounts = response.data.data;
+
+    if (accounts.length === 0) {
+      return res.status(404).json({ role: 'none', message: '用户不存在' });
+    }
+
+    if (accounts.length > 1) {
+      return res.status(404).json({ role: 'none', message: '存在多个用户实例，请联系技术组或电邮至john.du@do360.com' });
+    }
+
+    const account = accounts[0];
+
+    // Check if the password matches
+    if (account.Password === password) {
+      return res.status(200).json({ role: account.Role, message: '登录成功' });
+    } else {
+      return res.status(401).json({ role: 'none', message: '密码错误' });
+    }
+  } catch (error) {
+    console.error('Error during login process:', error);
+    return res.status(500).json({ role: 'none', message: 'Internal server error.' });
+  }
+
+}); 
 
 /**
  * This is the API designed or the Coupon System frontend, to validate Coupon by its Hash code
