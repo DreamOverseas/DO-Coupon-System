@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import QRCode from 'qrcode';
 
 const CouponPage = () => {
@@ -13,6 +14,17 @@ const CouponPage = () => {
 
   const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
   const API_KEY = process.env.REACT_APP_API_KEY;
+
+  useEffect(() => {
+    // Ensure only Provider role can view this page
+    const role = Cookies.get('role');
+    if (role === 'Provider') {
+      window.location.href = '/my-coupon-management';
+    } else if (role !== 'Admin') {
+      console.error("Unknown Status: Role.");
+      window.location.href = '/';
+    }
+  }, []);
 
   useEffect(() => {
     // Fetch coupons from Strapi backend
@@ -166,9 +178,8 @@ const CouponPage = () => {
             </div>
             <div className="mt-2 flex justify-between items-center">
               <span
-                className={`px-2 py-1 rounded text-white ${
-                  coupon.Active ? 'bg-green-500' : 'bg-red-500'
-                }`}
+                className={`px-2 py-1 rounded text-white ${coupon.Active ? 'bg-green-500' : 'bg-red-500'
+                  }`}
               >
                 {coupon.Active ? 'Active' : 'Inactive'}
               </span>
@@ -196,9 +207,8 @@ const CouponPage = () => {
         {Array.from({ length: totalPages }, (_, index) => (
           <button
             key={index}
-            className={`px-4 py-2 rounded border ${
-              currentPage === index + 1 ? 'bg-blue-500 text-white' : ''
-            }`}
+            className={`px-4 py-2 rounded border ${currentPage === index + 1 ? 'bg-blue-500 text-white' : ''
+              }`}
             onClick={() => setCurrentPage(index + 1)}
           >
             {index + 1}
