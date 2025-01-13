@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import QRCode from 'qrcode';
+import { useNavigate } from 'react-router-dom';
 
 const CouponPage = () => {
   const [coupons, setCoupons] = useState([]);
@@ -11,6 +12,8 @@ const CouponPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showActiveOnly, setShowActiveOnly] = useState(false);
   const itemsPerPage = 12;
+
+  const navigate = useNavigate();
 
   const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
   const API_KEY = process.env.REACT_APP_API_KEY;
@@ -96,6 +99,13 @@ const CouponPage = () => {
     }
   };
 
+  const handleLogout = () => {
+    // 删除所有 Cookies
+    Cookies.remove('username');
+    Cookies.remove('role');
+    navigate('/'); // 跳转到首页
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -143,14 +153,22 @@ const CouponPage = () => {
             </button>
           </div>
         </div>
-        <a
-          href="https://api.do360.com/admin/content-manager/collection-types/api::coupon.coupon/create"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-black text-white px-4 py-2 rounded"
-        >
-          New/新增
-        </a>
+        <div className="flex items-center space-x-4">
+          <a
+            href="https://api.do360.com/admin/content-manager/collection-types/api::coupon.coupon/create"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-black text-white px-4 py-2 rounded"
+          >
+            New/新增
+          </a>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded"
+          >
+            登出 / Logout
+          </button>
+        </div>
       </header>
 
       {/* Coupons */}
