@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import QRScanner from './QRScanner';
 import { useNavigate } from 'react-router-dom';
+import Overview from './overview';
+import History from './history';
 
 const Dashboard = () => {
     const [activeTab, setActiveTab] = useState('overview'); // 当前选中的栏目
@@ -27,13 +29,13 @@ const Dashboard = () => {
     const renderContent = () => {
         switch (activeTab) {
             case 'overview':
-                return <div className="p-4">卡券一览的内容 (Coupon Overview Content)</div>;
+                return <Overview />;
             case 'scanner':
                 return <QRScanner />;
             case 'history':
-                return <div className="p-4">使用历史的内容 (Coupon History Content)</div>;
+                return <History />;
             default:
-                return <div className="p-4">请选择一个栏目</div>;
+                return <div className="p-4">请选择一个栏目 | Please Select a section from the NavBar below</div>;
         }
     };
 
@@ -49,7 +51,7 @@ const Dashboard = () => {
             {/* 顶部横向导航栏 */}
             <header className="bg-gray-800 text-white py-4 px-6 flex items-center justify-between shadow-md">
                 <div className="flex items-center space-x-4">
-                    <img src="/logo512.png" alt="Logo" className="h-10 w-10" />
+                    <img src="/logo-wh.png" alt="Logo" className="h-10 w-10" />
                     <span className="text-lg font-bold">DO Coupon System - Client</span>
                 </div>
                 <div className="text-sm font-medium">Welcome, {username}</div>

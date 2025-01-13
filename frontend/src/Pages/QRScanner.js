@@ -135,7 +135,7 @@ const QRScanner = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center bg-gray-100">
+    <div className="h-full flex flex-col items-center justify-center bg-gray-100">
       <h1 className="text-2xl font-bold mb-4">扫描二维码 / Scan QR code</h1>
       <div className="w-full max-w-md bg-white p-4 shadow rounded">
         <video ref={videoRef} className="w-full" muted />
