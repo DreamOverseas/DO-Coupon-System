@@ -6,13 +6,12 @@ const History = () => {
   const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
   const API_KEY = process.env.REACT_APP_API_KEY;
 
-  const [records, setRecords] = useState([]); // 存储历史记录
-  const [filteredRecords, setFilteredRecords] = useState([]); // 过滤后的历史记录
-  const [searchTerm, setSearchTerm] = useState(''); // 搜索框内容
+  const [records, setRecords] = useState([]);
+  const [filteredRecords, setFilteredRecords] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const username = Cookies.get('username'); // 从 Cookie 中获取 username
+  const username = Cookies.get('username');
 
-  // 从 Strapi 获取历史记录数据
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -25,10 +24,10 @@ const History = () => {
           }
         );
         console.log(response);
-        const account = response.data.data[0]; // 获取第一个匹配的账户
+        const account = response.data.data[0];
         if (account && account.ConsumptionRecord) {
           const sortedRecords = account.ConsumptionRecord.sort(
-            (a, b) => new Date(b.Time) - new Date(a.Time) // 按时间从新到旧排序
+            (a, b) => new Date(b.Time) - new Date(a.Time)
           );
           setRecords(sortedRecords);
           setFilteredRecords(sortedRecords);
@@ -44,7 +43,6 @@ const History = () => {
     fetchHistory();
   }, [API_ENDPOINT, API_KEY, username]);
 
-  // 搜索逻辑
   useEffect(() => {
     const filtered = records.filter(
       (record) =>
@@ -56,7 +54,6 @@ const History = () => {
 
   return (
     <div className="p-4 h-full flex flex-col">
-      {/* 标题 */}
       <h1 className="text-2xl font-bold mb-4">卡券使用历史 / Coupon History</h1>
 
       {/* 搜索框 */}

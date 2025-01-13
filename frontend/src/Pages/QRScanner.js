@@ -5,10 +5,10 @@ import axios from 'axios';
 const QRScanner = () => {
   const [scanResult, setScanResult] = useState('');
   const [error, setError] = useState(null);
-  const [couponStatus, setCouponStatus] = useState(null); // 优惠券状态
+  const [couponStatus, setCouponStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const videoRef = useRef(null);
-  const streamRef = useRef(null); // 保存视频流
+  const streamRef = useRef(null);
 
   const BACKEND_API = process.env.REACT_APP_BACKEND_API;
 
@@ -31,10 +31,9 @@ const QRScanner = () => {
           video: { deviceId: selectedDeviceId },
         });
 
-        streamRef.current = stream; // 保存视频流
+        streamRef.current = stream;
         videoRef.current.srcObject = stream;
 
-        // 确保视频加载完成后再播放
         videoRef.current.onloadedmetadata = () => {
           videoRef.current.play().catch((err) => {
             console.error('视频播放失败:', err);
@@ -42,7 +41,6 @@ const QRScanner = () => {
           });
         };
 
-        // 解码二维码
         codeReader.decodeFromVideoDevice(selectedDeviceId, videoRef.current, (result) => {
           if (result) {
             handleScan(result.getText());
@@ -58,7 +56,6 @@ const QRScanner = () => {
     initScanner();
 
     return () => {
-      // 停止摄像头流
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
@@ -73,7 +70,7 @@ const QRScanner = () => {
 
     try {
       const response = await axios.post(`${BACKEND_API}/validate-coupon`, { hash: data });
-      setCouponStatus(response.data); // 接收后端返回的优惠券状态
+      setCouponStatus(response.data);
     } catch (error) {
       console.error('验证失败:', `尝试连接${BACKEND_API}/validate-coupon`, error);
       setCouponStatus({ status: 'invalid', message: '与云端失去连接，请尝试其他验证方法' });
@@ -87,7 +84,7 @@ const QRScanner = () => {
 
     try {
       const response = await axios.post(`${BACKEND_API}/use-coupon`, { hash: scanResult });
-      setCouponStatus(response.data); // 更新优惠券状态
+      setCouponStatus(response.data);
     } catch (error) {
       console.error('使用失败:', `尝试连接${BACKEND_API}/use-coupon`, error);
       alert('确认使用时发生错误，请重试。');

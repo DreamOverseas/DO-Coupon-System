@@ -1,6 +1,6 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "coupon_sys",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@zxing/browser": "^0.1.5",

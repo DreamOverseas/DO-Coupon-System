@@ -100,10 +100,10 @@ const CouponPage = () => {
   };
 
   const handleLogout = () => {
-    // 删除所有 Cookies
+    // Del all Cookies
     Cookies.remove('username');
     Cookies.remove('role');
-    navigate('/'); // 跳转到首页
+    navigate('/');
   };
 
   return (

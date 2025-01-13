@@ -16,7 +16,6 @@ const Overview = () => {
   const ITEMS_PER_PAGE = 12;
   const username = Cookies.get('username');
 
-  // 从 Strapi 获取卡券数据
   useEffect(() => {
     const fetchCoupons = async () => {
       try {

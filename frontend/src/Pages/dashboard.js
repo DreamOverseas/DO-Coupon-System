@@ -6,7 +6,7 @@ import Overview from './overview';
 import History from './history';
 
 const Dashboard = () => {
-    const [activeTab, setActiveTab] = useState('overview'); // 当前选中的栏目
+    const [activeTab, setActiveTab] = useState('overview');
     const [username, setUsername] = useState('');
     const navigate = useNavigate();
 
@@ -25,7 +25,6 @@ const Dashboard = () => {
         setUsername(storedUsername);
     }, []);
 
-    // 切换栏目的内容
     const renderContent = () => {
         switch (activeTab) {
             case 'overview':
@@ -40,10 +39,10 @@ const Dashboard = () => {
     };
 
     const handleLogout = () => {
-        // 删除所有 Cookies
+        // Del All Cookies
         Cookies.remove('username');
         Cookies.remove('role');
-        navigate('/'); // 跳转到首页
+        navigate('/');
     };
 
     return (
