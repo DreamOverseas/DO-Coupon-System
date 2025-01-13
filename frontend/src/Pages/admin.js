@@ -19,7 +19,7 @@ const CouponPage = () => {
     // Ensure only Provider role can view this page
     const role = Cookies.get('role');
     if (role === 'Provider') {
-      window.location.href = '/my-coupon-management';
+      window.location.href = '/dashboard';
     } else if (role !== 'Admin') {
       console.error("Unknown Status: Role.");
       window.location.href = '/';

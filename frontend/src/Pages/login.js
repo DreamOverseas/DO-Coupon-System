@@ -45,6 +45,11 @@ const isAccountValid = async (name, role) => {
 
     const account = accounts[0];
 
+    if (account.CurrentStatus!=="active"){
+      console.log("Checking Cookie: Account nolonger active.");
+      return false;
+    }
+
     // Double Checks
     if (account.Role === role) {
       console.log("Checking Cookie: Passed.");
@@ -76,7 +81,7 @@ const Login = () => {
       if (role === 'Admin') {
         window.location.href = '/admin-panel';
       } else if (role === 'Provider') {
-        window.location.href = '/my-coupon-management';
+        window.location.href = '/dashboard';
       }
     }
   }, []);
@@ -103,7 +108,7 @@ const Login = () => {
         if (role === 'Admin') {
           window.location.href = '/admin-panel';
         } else if (role === 'Provider') {
-          window.location.href = '/my-coupon-management';
+          window.location.href = '/dashboard';
         }
       }
     } catch (error) {

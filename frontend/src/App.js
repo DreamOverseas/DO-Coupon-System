@@ -3,8 +3,7 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import Login from './Pages/login';
 import Admin from './Pages/admin';
-import QRScanner from './Pages/QRScanner';
-import CouponMgnt from './Pages/myCouponMgnt';
+import Dashboard from './Pages/dashboard';
 
 function App() {
   return (
@@ -12,8 +11,7 @@ function App() {
       <Routes>
           <Route exact path='/' element={<Login />} />
           <Route path='/admin-panel' element={<Admin />} />
-          <Route path='/my-coupon-management' element={<CouponMgnt />} />
-          <Route path='/my-coupon-management/scan' element={<QRScanner />} />
+          <Route path='/dashboard' element={<Dashboard />} />
         </Routes>
     </div>
   );
