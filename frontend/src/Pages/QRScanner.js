@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const QRScanner = () => {
   const [scanResult, setScanResult] = useState('');
@@ -9,6 +10,8 @@ const QRScanner = () => {
   const [loading, setLoading] = useState(false);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
+  
+  const username = Cookies.get('username');
 
   const BACKEND_API = process.env.REACT_APP_BACKEND_API;
 
@@ -41,12 +44,14 @@ const QRScanner = () => {
           });
         };
 
-        codeReader.decodeFromVideoDevice(selectedDeviceId, videoRef.current, (result) => {
-          if (result) {
-            handleScan(result.getText());
-            setError(null);
-          }
-        });
+        if (!scanResult || scanResult === '') {
+          codeReader.decodeFromVideoDevice(selectedDeviceId, videoRef.current, (result) => {
+            if (result) {
+              handleScan(result.getText());
+              setError(null);
+            }
+          });
+        }
       } catch (err) {
         console.error('摄像头初始化失败:', err);
         setError('摄像头初始化失败，请检查设备设置。');
@@ -60,7 +65,7 @@ const QRScanner = () => {
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleScan = async (data) => {
@@ -83,7 +88,7 @@ const QRScanner = () => {
     if (!couponStatus || couponStatus.status !== 'valid') return;
 
     try {
-      const response = await axios.post(`${BACKEND_API}/use-coupon`, { hash: scanResult });
+      const response = await axios.post(`${BACKEND_API}/use-coupon`, { hash: scanResult, username: username });
       setCouponStatus(response.data);
     } catch (error) {
       console.error('使用失败:', `尝试连接${BACKEND_API}/use-coupon`, error);

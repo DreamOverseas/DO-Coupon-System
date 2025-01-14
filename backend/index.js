@@ -100,10 +100,8 @@ app.post('/validate-coupon', async (req, res) => {
     const coupons = await getAllCoupons();
     const coupon = coupons.find((item) => item.Hash === hash);
 
-    console.log(coupons);
-
     if (!coupon) {
-      return res.status(404).json({ status: 'invalid', message: '无效二维码' });
+      return res.json({ status: 'invalid', message: '无效二维码' });
     }
 
     if (!coupon.Active) {
@@ -120,7 +118,7 @@ app.post('/validate-coupon', async (req, res) => {
 
     res.json({
       status: 'valid',
-      message: '[优惠券有效',
+      message: '优惠券有效',
       title: coupon.Title,
       description: coupon.Description,
     });
@@ -131,18 +129,20 @@ app.post('/validate-coupon', async (req, res) => {
 });
 
 /**
- * This is the API designed or the Coupon System frontend, to use Coupon by its Hash code from the provider's QR scan
+ * This is the API designed for the Coupon System frontend, to use Coupon by its Hash code from the provider's QR scan
  * @params hash -> the hash value for use
- * @returns message -> Chinese explation for the successful or not and for viewing in frontend
+ * @params username -> the username of the user consuming the coupon
+ * @returns message -> Chinese explanation for the successful or not and for viewing in frontend
  */
 app.post('/use-coupon', async (req, res) => {
-  const { hash } = req.body;
+  const { hash, username } = req.body;
 
   if (!hash) {
     return res.status(400).json({ message: '无效二维码' });
   }
 
   try {
+    // Step 1: Find the coupon by hash
     const coupons = await getAllCoupons();
     const couponData = coupons.find((item) => item.Hash === hash);
 
@@ -150,13 +150,12 @@ app.post('/use-coupon', async (req, res) => {
       return res.status(404).json({ message: '无效二维码' });
     }
 
-    console.log(`Coupon Found with ID ${couponData.documentId}: `, couponData);
-
     const couponId = couponData.documentId;
     const coupon = couponData;
 
     const updatedUsesLeft = coupon.UsesLeft - 1;
 
+    // Step 2: Update the coupon's UsesLeft and Active status
     await axios.put(
       `${STRAPI_API}/coupons/${couponId}`,
       {
@@ -170,11 +169,56 @@ app.post('/use-coupon', async (req, res) => {
       }
     );
 
-    res.json({ message: '优惠券使用成功！' });
+    // Step 3: Find the user by username
+    const userResponse = await axios.get(
+      `${STRAPI_API}/coupon-sys-accounts?populate=ConsumptionRecord&filters[Name][$eq]=${username}`,
+      {
+        headers: { Authorization: `Bearer ${STRAPI_KEY}` },
+      }
+    );
+
+    const user = userResponse.data.data[0];
+
+    if (!user) {
+      return res.status(404).json({ message: '用户未找到，无法记录使用历史' });
+    }
+
+    const userId = user.documentId;
+    const consumptionRecord = user.ConsumptionRecord || []; // 获取现有的记录
+    const sanitizedConsumptionRecord = consumptionRecord.map((record) => {
+      const { id, ...rest } = record; // 移除 id 字段
+      return rest;
+    });
+
+    // Step 4: Add a new entry to ConsumptionRecord
+    const newRecord = {
+      Consumer: coupon.AssignedTo,
+      Provider: coupon.AssignedFrom,
+      Platform: 'CouponSystem',
+      Time: new Date().toISOString(), 
+      Amount: 1,
+      AdditionalInfo: coupon.Title,
+    };
+
+    await axios.put(
+      `${STRAPI_API}/coupon-sys-accounts/${userId}`,
+      {
+        data: {
+          ConsumptionRecord: [...sanitizedConsumptionRecord, newRecord], // 添加新记录
+        },
+      },
+      {
+        headers: { Authorization: `Bearer ${STRAPI_KEY}` },
+      }
+    );
+
+    res.json({ message: '优惠券使用成功，并记录到用户历史！' });
   } catch (error) {
+    console.error('Error using coupon:', error.message);
     res.status(500).json({ message: '服务器错误' });
   }
 });
+
 
 const PORT = process.env.PORT || 3003;
 app.listen(PORT, () => {
