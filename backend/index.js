@@ -104,16 +104,16 @@ app.post('/validate-coupon', async (req, res) => {
       return res.json({ status: 'invalid', message: '无效二维码' });
     }
 
-    if (!coupon.Active) {
-      return res.json({ status: 'inactive', message: '优惠券已失效' });
-    }
-
     if (new Date(coupon.Expiry) < new Date()) {
       return res.json({ status: 'expired', message: '优惠券已过期' });
     }
 
     if (coupon.UsesLeft <= 0) {
       return res.json({ status: 'used', message: '优惠券已使用完毕' });
+    }
+
+    if (!coupon.Active) {
+      return res.json({ status: 'inactive', message: '优惠券已失效' });
     }
 
     res.json({
