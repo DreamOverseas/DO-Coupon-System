@@ -43,7 +43,7 @@ const QRScanner = () => {
         setVideoDevices(videoInputDevices); // 保存摄像设备列表
 
         // 默认选择第一个设备
-        const selectedDeviceId = videoInputDevices[0].deviceId;
+        const selectedDeviceId = videoInputDevices[currentDeviceIndex].deviceId;
 
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { deviceId: selectedDeviceId },
