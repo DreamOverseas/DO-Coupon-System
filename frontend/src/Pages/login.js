@@ -59,7 +59,7 @@ const isAccountValid = async (name, role) => {
       return false;
     }
   } catch (error) {
-    console.error('Error during lcookie check:', error);
+    console.error('Error during cookie check:', error);
     return false;
   }
 }
@@ -70,6 +70,10 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
+    //Test
+    Cookies.set('username', "RHP", { expires: 7 });
+    Cookies.set('role', "Provider", { expires: 7 });
+
     // Check for existing cookie and redirect if logged in
     const role = Cookies.get('role');
     const username = Cookies.get('username');

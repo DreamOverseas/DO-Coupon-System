@@ -16,6 +16,15 @@ const QRScanner = () => {
   const username = Cookies.get('username');
   const BACKEND_API = process.env.REACT_APP_BACKEND_API;
 
+  //Test 
+  const [logs, setLogs] = useState([]);
+
+  const log = (message) => {
+    console.log(message);
+    setLogs((prevLogs) => [...prevLogs, message]);
+  };
+
+
   useEffect(() => {
     const initScanner = async () => {
       const codeReader = new BrowserMultiFormatReader();
@@ -23,6 +32,8 @@ const QRScanner = () => {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoInputDevices = devices.filter((device) => device.kind === 'videoinput');
+        log(`all devices: ${devices}`);
+        log(`After Filtered: ${videoInputDevices}`);
 
         if (videoInputDevices.length === 0) {
           setError('未检测到摄像头，请检查设备权限。');
@@ -149,6 +160,19 @@ const QRScanner = () => {
 
   return (
     <div className="h-full flex flex-col items-center justify-center bg-gray-100">
+
+
+      <div className="log-output bg-gray-100 p-4 mt-4">
+        <h3 className="text-lg font-bold">Logs:</h3>
+        <ul>
+          {logs.map((log, index) => (
+            <li key={index} className="text-sm text-gray-700">{log}</li>
+          ))}
+        </ul>
+      </div>
+
+
+
       <h1 className="text-2xl font-bold mb-4">扫描二维码 / Scan QR code</h1>
       <div className="w-full max-w-md bg-white p-4 shadow rounded">
         <video ref={videoRef} className="w-full" muted />
@@ -158,9 +182,8 @@ const QRScanner = () => {
       </div>
       <button
         onClick={handleSwitchCamera}
-        className={`mt-4 ${
-          videoDevices.length > 1 ? 'bg-blue-500 hover:bg-blue-700' : 'bg-gray-400'
-        } text-white font-bold py-2 px-4 rounded`}
+        className={`mt-4 ${videoDevices.length > 1 ? 'bg-blue-500 hover:bg-blue-700' : 'bg-gray-400'
+          } text-white font-bold py-2 px-4 rounded`}
         disabled={videoDevices.length <= 1}
       >
         切换摄像头 / Switch Camera
