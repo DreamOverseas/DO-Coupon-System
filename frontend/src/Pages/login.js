@@ -70,10 +70,6 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    //Test
-    Cookies.set('username', "RHP", { expires: 7 });
-    Cookies.set('role', "Provider", { expires: 7 });
-
     // Check for existing cookie and redirect if logged in
     const role = Cookies.get('role');
     const username = Cookies.get('username');

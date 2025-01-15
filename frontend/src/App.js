@@ -2,7 +2,7 @@ import './App.css';
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import Login from './Pages/login';
-import Admin from './Pages/admin';
+import CouponPage from './Pages/admin';
 import Dashboard from './Pages/dashboard';
 
 function App() {
@@ -10,7 +10,7 @@ function App() {
     <div className="App">
       <Routes>
           <Route exact path='/' element={<Login />} />
-          <Route path='/admin-panel' element={<Admin />} />
+          <Route path='/admin-panel' element={<CouponPage />} />
           <Route path='/dashboard' element={<Dashboard />} />
         </Routes>
     </div>

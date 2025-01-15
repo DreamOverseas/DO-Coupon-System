@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import QRCode from 'qrcode';
+import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 
 const CouponPage = () => {
@@ -12,22 +12,12 @@ const CouponPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showActiveOnly, setShowActiveOnly] = useState(false);
   const itemsPerPage = 12;
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const navigate = useNavigate();
 
   const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
   const API_KEY = process.env.REACT_APP_API_KEY;
-
-  useEffect(() => {
-    // Ensure only Provider role can view this page
-    const role = Cookies.get('role');
-    if (role === 'Provider') {
-      window.location.href = '/dashboard';
-    } else if (role !== 'Admin') {
-      console.error("Unknown Status: Role.");
-      window.location.href = '/';
-    }
-  }, []);
 
   useEffect(() => {
     // Fetch coupons from Strapi backend
@@ -100,7 +90,7 @@ const CouponPage = () => {
   };
 
   const handleLogout = () => {
-    // Del all Cookies
+    // Del All Cookies
     Cookies.remove('username');
     Cookies.remove('role');
     navigate('/');
@@ -109,13 +99,79 @@ const CouponPage = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <header className="bg-white shadow p-4 flex items-center justify-between">
+      <header className="bg-white shadow p-4 flex items-center justify-between md:justify-start md:gap-4">
         <div className="flex items-center gap-4">
           <img src="/logo512.png" alt="Logo" className="w-12 h-12" />
           <h1 className="text-xl font-bold">DO Coupon System</h1>
         </div>
-        <div className="flex gap-4">
-          {/* Search */}
+        <div className="flex-1 hidden md:flex justify-between items-center">
+          <div className="flex gap-4">
+            {/* Search */}
+            <input
+              type="text"
+              placeholder="Search"
+              className="border rounded px-4 py-2"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+
+            {/* Active Toggle */}
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={showActiveOnly}
+                onChange={() => setShowActiveOnly((prev) => !prev)}
+              />
+              <span>Show Active Only</span>
+            </label>
+
+            {/* Sort */}
+            <div className="flex items-center gap-2">
+              <select
+                className="border rounded px-2 py-2"
+                value={sortField}
+                onChange={(e) => setSortField(e.target.value)}
+              >
+                <option value="Title">Title</option>
+                <option value="Expiry">Expiry</option>
+                <option value="UsesLeft">Uses Left</option>
+              </select>
+              <button
+                className="border rounded px-2 py-2"
+                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              >
+                {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+              </button>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <a
+              href="https://api.do360.com/admin/content-manager/collection-types/api::coupon.coupon/create"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-black text-white px-4 py-2 rounded"
+            >
+              New/新增
+            </a>
+            <button
+              className="bg-red-500 text-white px-4 py-2 rounded"
+              onClick={handleLogout}
+            >
+              Logout/登出
+            </button>
+          </div>
+        </div>
+        <button
+          className="md:hidden text-xl"
+          onClick={() => setMenuOpen((prev) => !prev)}
+        >
+          ☰
+        </button>
+      </header>
+
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div className="bg-white shadow p-4 flex flex-col gap-4 md:hidden">
           <input
             type="text"
             placeholder="Search"
@@ -123,8 +179,6 @@ const CouponPage = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-
-          {/* Active Toggle */}
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -133,8 +187,6 @@ const CouponPage = () => {
             />
             <span>Show Active Only</span>
           </label>
-
-          {/* Sort */}
           <div className="flex items-center gap-2">
             <select
               className="border rounded px-2 py-2"
@@ -152,24 +204,22 @@ const CouponPage = () => {
               {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
             </button>
           </div>
-        </div>
-        <div className="flex items-center space-x-4">
           <a
             href="https://api.do360.com/admin/content-manager/collection-types/api::coupon.coupon/create"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-black text-white px-4 py-2 rounded"
+            className="bg-black text-white px-4 py-2 rounded text-center"
           >
             New/新增
           </a>
           <button
+            className="bg-red-500 text-white px-4 py-2 rounded text-center"
             onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded"
           >
-            登出 / Logout
+            Logout/登出
           </button>
         </div>
-      </header>
+      )}
 
       {/* Coupons */}
       <main className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
