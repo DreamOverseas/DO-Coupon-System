@@ -10,7 +10,7 @@ const API_KEY = process.env.REACT_APP_API_KEY;
 
 // Check if the Cookie still have valid records.
 const isAccountValid = async (name, role) => {
-  if (!name || !role){
+  if (!name || !role) {
     console.log("Checking Cookie: Missing field.");
     return false;
   }
@@ -45,7 +45,7 @@ const isAccountValid = async (name, role) => {
 
     const account = accounts[0];
 
-    if (account.CurrentStatus!=="active"){
+    if (account.CurrentStatus !== "active") {
       console.log("Checking Cookie: Account nolonger active.");
       return false;
     }
@@ -86,6 +86,11 @@ const Login = () => {
     }
   }, []);
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleLogin(); // 按下 Enter 键触发登录
+    }
+  };
 
   const handleLogin = async () => {
     if (!name || !password) {
@@ -123,11 +128,13 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100"
+      onKeyDown={handleKeyDown}
+    >
       <div className="w-full max-w-md p-8 bg-white rounded shadow-md">
         <h1 className="text-2xl font-bold text-center">DO Coupon Management System</h1>
         <h2 className="text-lg font-medium text-center text-gray-600 mt-2">DO集团优惠券管理系统</h2>
-        
+
         {errorMessage && (
           <div className="mt-4 text-red-500 text-center">{errorMessage}</div>
         )}
