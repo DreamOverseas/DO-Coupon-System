@@ -8,8 +8,8 @@ const QRScanner = () => {
   const [error, setError] = useState(null);
   const [couponStatus, setCouponStatus] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [videoDevices, setVideoDevices] = useState([]); // 所有摄像设备
-  const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0); // 当前设备索引
+  const [videoDevices, setVideoDevices] = useState([]);
+  const [currentDeviceIndex, setCurrentDeviceIndex] = useState(1); // Default to the 2nd one
   const videoRef = useRef(null);
   const streamRef = useRef(null);
 
@@ -29,9 +29,10 @@ const QRScanner = () => {
           return;
         }
 
-        // set default camera to 1 if multiple device detected
-        if (videoInputDevices.length > 1 && currentDeviceIndex !== 1) {
-          setCurrentDeviceIndex(1);
+        // reset to 0 if only 1 device is detected
+        if (videoInputDevices.length === 1 && currentDeviceIndex !== 0) {
+          setCurrentDeviceIndex(0);
+          return;
         }
 
         setVideoDevices(videoInputDevices);
