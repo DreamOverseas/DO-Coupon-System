@@ -11,12 +11,19 @@ app.use(bodyParser.json());
 const STRAPI_API = process.env.STRAPI_API;
 const STRAPI_KEY = process.env.STRAPI_KEY;
 
-// Function that get all coupons from backend
-const getAllCoupons = async () => {
+// Function that gets all coupons from backend for a specific username
+const getAllCoupons = async (username) => {
   try {
-    const response = await axios.get(`${STRAPI_API}/coupons`, {
+    if (!username) {
+      throw new Error('用户名未提供');
+    }
+
+    // Send request to backend with AssignedFrom filter
+    const response = await axios.get(`${STRAPI_API}/coupons?filters[AssignedFrom][$eq]=${username}`, {
       headers: { Authorization: `Bearer ${STRAPI_KEY}` },
     });
+
+    // Return filtered coupons data
     return response.data.data;
   } catch (error) {
     console.error('获取优惠券失败:', error);
@@ -65,6 +72,7 @@ app.post('/login', async (req, res) => {
     }
 
     if (accounts.length > 1) {
+      console.error("More than 1 user with same name, please assist.");
       return res.status(404).json({ role: 'none', message: '存在多个用户实例，请联系技术组或电邮至john.du@do360.com' });
     }
 
@@ -90,14 +98,15 @@ app.post('/login', async (req, res) => {
  * @returns message -> Chinese explation for the status and for viewing in frontend
  */
 app.post('/validate-coupon', async (req, res) => {
-  const { hash } = req.body;
+  const { hash, username } = req.body;
 
-  if (!hash) {
-    return res.status(400).json({ status: 'invalid', message: '无效请求' });
+  if (!hash || !username) {
+    console.error("Missing Request Argument(s). Request aborted.");
+    return res.status(400).json({ status: 'invalid', message: '无效请求，可能缺失请求内容' });
   }
 
   try {
-    const coupons = await getAllCoupons();
+    const coupons = await getAllCoupons(username);
     const coupon = coupons.find((item) => item.Hash === hash);
 
     if (!coupon) {
@@ -116,6 +125,7 @@ app.post('/validate-coupon', async (req, res) => {
       return res.json({ status: 'inactive', message: '优惠券已失效' });
     }
 
+    logSuccess(200, "Coupon Validation Passed");
     res.json({
       status: 'valid',
       message: '优惠券有效',
@@ -143,7 +153,7 @@ app.post('/use-coupon', async (req, res) => {
 
   try {
     // Step 1: Find the coupon by hash
-    const coupons = await getAllCoupons();
+    const coupons = await getAllCoupons(username);
     const couponData = coupons.find((item) => item.Hash === hash);
 
     if (!couponData) {
@@ -180,6 +190,7 @@ app.post('/use-coupon', async (req, res) => {
     const user = userResponse.data.data[0];
 
     if (!user) {
+      console.error("Missing User Specs, Request aborted.");
       return res.status(404).json({ message: '用户未找到，无法记录使用历史' });
     }
 
@@ -212,6 +223,7 @@ app.post('/use-coupon', async (req, res) => {
       }
     );
 
+    logSuccess(200, `Coupon used successfully for ${coupon.title}`);
     res.json({ message: '优惠券使用成功，并记录到用户历史！' });
   } catch (error) {
     console.error('Error using coupon:', error.message);
