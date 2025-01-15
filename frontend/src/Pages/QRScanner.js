@@ -8,11 +8,12 @@ const QRScanner = () => {
   const [error, setError] = useState(null);
   const [couponStatus, setCouponStatus] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [videoDevices, setVideoDevices] = useState([]); // 所有摄像设备
+  const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0); // 当前设备索引
   const videoRef = useRef(null);
   const streamRef = useRef(null);
-  
-  const username = Cookies.get('username');
 
+  const username = Cookies.get('username');
   const BACKEND_API = process.env.REACT_APP_BACKEND_API;
 
   useEffect(() => {
@@ -28,6 +29,9 @@ const QRScanner = () => {
           return;
         }
 
+        setVideoDevices(videoInputDevices); // 保存摄像设备列表
+
+        // 默认选择第一个设备
         const selectedDeviceId = videoInputDevices[0].deviceId;
 
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -66,7 +70,7 @@ const QRScanner = () => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentDeviceIndex]); // 监听设备索引的变化，切换设备时重新初始化
 
   const handleScan = async (data) => {
     if (!data) return;
@@ -88,12 +92,19 @@ const QRScanner = () => {
     if (!couponStatus || couponStatus.status !== 'valid') return;
 
     try {
-      const response = await axios.post(`${BACKEND_API}/use-coupon`, { hash: scanResult, username: username });
+      const response = await axios.post(`${BACKEND_API}/use-coupon`, { hash: scanResult, username });
       setCouponStatus(response.data);
     } catch (error) {
       console.error('使用失败:', `尝试连接${BACKEND_API}/use-coupon`, error);
       alert('确认使用时发生错误，请重试。');
     }
+  };
+
+  const handleSwitchCamera = async () => {
+    if (videoDevices.length <= 1) return; // 没有更多设备可切换
+
+    const nextDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length; // 循环切换设备
+    setCurrentDeviceIndex(nextDeviceIndex);
   };
 
   const renderIcon = () => {
@@ -145,6 +156,15 @@ const QRScanner = () => {
         {scanResult && !loading && renderCouponDetails()}
         {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
+      <button
+        onClick={handleSwitchCamera}
+        className={`mt-4 ${
+          videoDevices.length > 1 ? 'bg-blue-500 hover:bg-blue-700' : 'bg-gray-400'
+        } text-white font-bold py-2 px-4 rounded`}
+        disabled={videoDevices.length <= 1}
+      >
+        切换摄像头 / Switch Camera
+      </button>
     </div>
   );
 };
