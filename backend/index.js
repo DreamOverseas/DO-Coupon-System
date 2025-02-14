@@ -231,6 +231,68 @@ app.post('/use-coupon', async (req, res) => {
   }
 });
 
+/**
+ * This is the API designed for creating a new coupon from a in/external system on API call
+ * @params title -> the title for coupon
+ * @params description -> short description for the coupon
+ * @params expiry -> the exp date in yyyy-MM-dd
+ * @params assigned_from -> who provides good/service with this coupon
+ * @params assigned_to -> who owns this coupon
+ * @returns couponStatus -> the status of created coupon; 'active' if successful
+ * @returns QRdata -> the hash needed for creating QR Code, get from successful creation
+ * @returns message -> natrual language describing situation for debugging and more
+ */
+app.post('/create-active-coupon', async (req, res) => {
+  const {title, description, expiry, assigned_from, assigned_to } = req.body;
+
+  if (!title || !expiry || !assigned_from || !assigned_to){
+    return res.status(400).json({ couponStatus: 'fail', message: 'Title, Expiry Date, assigning info are nessesary.' });
+  }
+
+  const couponData = {
+    data: {
+      Title: title,
+      Description: description || '',
+      Expiry: expiry,
+      AssignedFrom: assigned_from,
+      AssignedTo: assigned_to,
+      Active: true
+    }
+  };
+
+  try {
+    const strapiResponse = await fetch(`${STRAPI_API}/coupons`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${STRAPI_KEY}`
+      },
+      body: JSON.stringify(couponData)
+    });
+
+    const strapiResult = await strapiResponse.json();
+
+    if (!strapiResponse.ok) {
+      return res.status(strapiResponse.status).json({
+        couponStatus: 'fail',
+        message: strapiResult.error?.message || 'Failed to create coupon in Strapi.'
+      });
+    }
+
+    const hash = strapiResult?.data?.Hash;
+    return res.status(201).json({
+      couponStatus: 'active',
+      QRdata: hash,
+      message: 'Coupon created successfully.'
+    });
+  } catch (error) {
+    return res.status(500).json({
+      couponStatus: 'fail',
+      message: 'Server error: ' + error.message
+    });
+  }
+});
+
 
 const PORT = process.env.PORT || 3003;
 app.listen(PORT, () => {
