@@ -5,7 +5,26 @@ const cors = require('cors');
 const app = express();
 require('dotenv').config();
 
-app.use(cors());
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://1club.world',
+];
+
+const corsOptions = {
+  origin: function(origin, callback) {
+    // 如果请求中没有 origin（如同域请求或非浏览器环境下的请求），直接允许
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 const STRAPI_API = process.env.STRAPI_API;
