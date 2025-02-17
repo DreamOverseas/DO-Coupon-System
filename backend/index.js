@@ -6,6 +6,7 @@ const app = express();
 require('dotenv').config();
 
 const allowedOrigins = [
+  'https://coupon.do360.com',
   'http://localhost:3000',
   'https://1club.world',
 ];
