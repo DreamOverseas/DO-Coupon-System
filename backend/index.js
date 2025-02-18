@@ -26,6 +26,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.options('*', cors()); // 允许所有 OPTIONS 预检请求
+
 app.use(bodyParser.json());
 
 const STRAPI_API = process.env.STRAPI_API;
