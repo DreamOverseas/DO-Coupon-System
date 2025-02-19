@@ -9,6 +9,9 @@ const allowedOrigins = [
   'https://coupon.do360.com',
   'http://localhost:3000',
   'https://1club.world',
+  'http://1club.world',       // HTTP 
+  'https://www.1club.world',  // www.
+  'http://www.1club.world'
 ];
 
 const corsOptions = {
@@ -28,7 +31,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors()); // 允许所有 OPTIONS 预检请求
+app.options('*', cors(corsOptions)); // 允许所有 OPTIONS 预检请求
 
 app.use(bodyParser.json());
 
