@@ -6,12 +6,13 @@ const app = express();
 require('dotenv').config();
 
 const allowedOrigins = [
+  'http://localhost:3000', // TODO: Del for Dev
+  'http://localhost:3001',
+  'http://localhost:3003',
   'https://coupon.do360.com',
-  'http://localhost:3000',
   'https://1club.world',
-  'http://1club.world',       // HTTP 
   'https://www.1club.world',  // www.
-  'http://www.1club.world'
+  'https://roseneathholidaypark.au',
 ];
 
 const corsOptions = {
