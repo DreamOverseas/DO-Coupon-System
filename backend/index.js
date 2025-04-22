@@ -9,6 +9,7 @@ const allowedOrigins = [
   'http://localhost:3000', // TODO: Del for Dev
   'http://localhost:3001',
   'http://localhost:3003',
+  'http://localhost:5173', // TODO: Del
   'https://coupon.do360.com',
   'https://1club.world',
   'https://www.1club.world',  // www.
