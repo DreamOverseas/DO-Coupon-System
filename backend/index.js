@@ -13,6 +13,7 @@ const allowedOrigins = [
   'https://1club.world',
   'https://www.1club.world',  // www.
   'https://roseneathholidaypark.au',
+  'https://world-cooperation.org',
 ];
 
 const corsOptions = {
