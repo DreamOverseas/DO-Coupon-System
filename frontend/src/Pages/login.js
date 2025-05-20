@@ -112,7 +112,7 @@ const Login = () => {
         // Redirect based on role
         if (role === 'Admin') {
           window.location.href = '/admin-panel';
-        } else if (role === 'Provider') {
+        } else {
           window.location.href = '/dashboard';
         }
       }
@@ -132,15 +132,15 @@ const Login = () => {
       onKeyDown={handleKeyDown}
     >
       <div className="w-full max-w-md p-8 bg-white rounded shadow-md">
-        <h1 className="text-2xl font-bold text-center">DO Coupon Management System</h1>
-        <h2 className="text-lg font-medium text-center text-gray-600 mt-2">DO集团优惠券管理系统</h2>
+        <h1 className="text-2xl font-bold text-center">DO Membership & Coupon Management System</h1>
+        <h2 className="text-lg font-medium text-center text-gray-600 mt-2">DO集团会员及核销券管理系统</h2>
 
         {errorMessage && (
           <div className="mt-4 text-red-500 text-center">{errorMessage}</div>
         )}
 
         <div className="mt-6">
-          <label className="block text-gray-700">用户名：</label>
+          <label className="block text-left text-gray-700">UserName / 用户名</label>
           <input
             type="text"
             value={name}
@@ -150,7 +150,7 @@ const Login = () => {
         </div>
 
         <div className="mt-4">
-          <label className="block text-gray-700">密码：</label>
+          <label className="block text-left text-gray-700">Password / 密码</label>
           <input
             type="password"
             value={password}
@@ -163,7 +163,7 @@ const Login = () => {
           onClick={handleLogin}
           className="w-full px-4 py-2 mt-6 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none"
         >
-          登录
+          Login / 登录
         </button>
       </div>
     </div>
