@@ -10,7 +10,7 @@ const Dashboard = () => {
     const [activeTab, setActiveTab] = useState('overview');
     const [username, setUsername] = useState('');
     const navigate = useNavigate();
-
+    const MembershipField = Cookies.get('membershipField');
 
     useEffect(() => {
         // Ensure only Provider role can view this page
@@ -87,13 +87,15 @@ const Dashboard = () => {
                     <p className={`mt-1 hidden sm:block ${activeTab === 'scanner' ? 'font-bold' : 'font-normal'}`}>扫描卡券 / Scan Coupon</p>
                 </button>
 
-                <button
-                    className="flex flex-col items-center text-xs focus:outline-none"
-                    onClick={() => setActiveTab('membership')}
-                >
-                    <i className={`bi bi-person-bounding-box text-lg transition-opacity ${activeTab === 'membership' ? 'text-violet-400' : 'text-white'}`}></i>
-                    <p className={`mt-1 hidden sm:block ${activeTab === 'membership' ? 'font-bold' : 'font-normal'}`}>会员验证 / Membership Verify</p>
-                </button>
+                {MembershipField && MembershipField !== 'null' && MembershipField !== 'undefined' && MembershipField.trim() !== '' && (
+                    <button
+                        className="flex flex-col items-center text-xs focus:outline-none"
+                        onClick={() => setActiveTab('membership')}
+                    >
+                        <i className={`bi bi-person-bounding-box text-lg transition-opacity ${activeTab === 'membership' ? 'text-violet-400' : 'text-white'}`}></i>
+                        <p className={`mt-1 hidden sm:block ${activeTab === 'membership' ? 'font-bold' : 'font-normal'}`}>会员验证 / Membership Verify</p>
+                    </button>
+                )}
 
                 <button
                     className="flex flex-col items-center text-xs focus:outline-none"
