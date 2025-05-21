@@ -88,7 +88,7 @@ const Login = () => {
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      handleLogin(); // 按下 Enter 键触发登录
+      handleLogin();
     }
   };
 
@@ -100,7 +100,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(`${BACKEND_API}/login`, { name, password });
-      const { role, message } = response.data;
+      const { role, membershipField, message } = response.data;
 
       if (role === 'none') {
         setErrorMessage(message);
@@ -108,6 +108,7 @@ const Login = () => {
         // Set cookies for 7 days
         Cookies.set('username', name, { expires: 7 });
         Cookies.set('role', role, { expires: 7 });
+        Cookies.set('membershipField', membershipField, { expires: 7 });
 
         // Redirect based on role
         if (role === 'Admin') {
