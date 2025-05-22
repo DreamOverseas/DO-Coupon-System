@@ -286,7 +286,9 @@ app.post('/create-active-coupon', async (req, res) => {
       Expiry: expiry,
       AssignedFrom: assigned_from,
       AssignedTo: assigned_to,
-      Active: true
+      Active: true,
+      Email: email,
+      Contact: contact
     }
   };
 
