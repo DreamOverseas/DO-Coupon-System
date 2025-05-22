@@ -377,10 +377,13 @@ app.post('/record-md-deduction', async (req, res) => {
       AdditionalInfo: notes,
     };
 
+    const { id, data: otherFields } = user;
+
     await axios.put(
       `${STRAPI_API}/coupon-sys-accounts/${userId}`,
       {
         data: {
+          ...otherFields,
           ConsumptionRecord: [...sanitizedConsumptionRecord, newRecord], // New record la
         },
       },
@@ -390,10 +393,10 @@ app.post('/record-md-deduction', async (req, res) => {
     );
 
     logSuccess(200, `[CouponSys - MembershipDirect] Consumed ${amount} successfully for ${member}.`);
-    res.json({ message: '优惠券使用成功，并记录到用户历史！' });
+    res.json({ message: '成功，已记录到用户历史！' });
   } catch (error) {
-    console.error('Error using coupon:', error.message);
-    res.status(500).json({ message: '服务器错误' });
+    console.error('Error Ocuured - ', error.response?.data);
+    res.status(500).json({ message: '服务器宕机辣' });
   }
 });
 
