@@ -19,7 +19,6 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function(origin, callback) {
-    // 如果请求中没有 origin（如同域请求或非浏览器环境下的请求），直接允许
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.indexOf(origin) !== -1) {
@@ -34,7 +33,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // 允许所有 OPTIONS 预检请求
+app.options('*', cors(corsOptions));
 
 app.use(bodyParser.json());
 
@@ -110,7 +109,8 @@ app.post('/login', async (req, res) => {
 
     // Check if the password matches
     if (account.Password === password) {
-      return res.status(200).json({ role: account.Role, message: '登录成功' });
+      logSuccess(200, `User ${account.Name} logged in as ${account.Role}.`)
+      return res.status(200).json({ role: account.Role, membershipField: account.MembershipField, message: '登录成功' });
     } else {
       return res.status(401).json({ role: 'none', message: '密码错误' });
     }
@@ -171,7 +171,7 @@ app.post('/validate-coupon', async (req, res) => {
 /**
  * This is the API designed for the Coupon System frontend, to use Coupon by its Hash code from the provider's QR scan
  * @params hash -> the hash value for use
- * @params username -> the username of the user consuming the coupon
+ * @params username -> the account name of the Coupon Sys
  * @returns message -> Chinese explanation for the successful or not and for viewing in frontend
  */
 app.post('/use-coupon', async (req, res) => {
@@ -253,7 +253,7 @@ app.post('/use-coupon', async (req, res) => {
       }
     );
 
-    logSuccess(200, `Coupon used successfully for ${coupon.title}`);
+    logSuccess(200, `[CouponSys] Coupon used successfully for ${coupon.title}`);
     res.json({ message: '优惠券使用成功，并记录到用户历史！' });
   } catch (error) {
     console.error('Error using coupon:', error.message);
@@ -273,7 +273,7 @@ app.post('/use-coupon', async (req, res) => {
  * @returns message -> natrual language describing situation for debugging and more
  */
 app.post('/create-active-coupon', async (req, res) => {
-  const {title, description, expiry, assigned_from, assigned_to } = req.body;
+  const {title, description, expiry, assigned_from, assigned_to, email, contact } = req.body;
 
   if (!title || !expiry || !assigned_from || !assigned_to){
     return res.status(400).json({ couponStatus: 'fail', message: 'Title, Expiry Date, assigning info are nessesary.' });
@@ -320,6 +320,78 @@ app.post('/create-active-coupon', async (req, res) => {
       couponStatus: 'fail',
       message: 'Server error: ' + error.message
     });
+  }
+});
+
+
+/**
+ * This is the API designed for the Coupon System frontend, to use Coupon by its Hash code from the provider's QR scan
+ * @params amount -> the number of point consumed (addition of Membership p & Discount p)
+ * @params account -> the account name of the Coupon Sys
+ * @returns member -> member whose points is being consumed
+ * @returns notes -> Chinese explanation for the successful or not and for viewing in frontend
+ */
+app.post('/record-md-deduction', async (req, res) => {
+  const { amount, account, member, notes } = req.body;
+
+  if (!amount) {
+    return res.status(400).json({ message: 'How much consumed is NeSseSarY!' });
+  }
+
+  if (!account || !member) {
+    return res.status(400).json({ message: 'System account & Member detail is required!' });
+  }
+
+  try {
+    // Step 1: Find the user by username
+    const userResponse = await axios.get(
+      `${STRAPI_API}/coupon-sys-accounts?populate=ConsumptionRecord&filters[Name][$eq]=${account}`,
+      {
+        headers: { Authorization: `Bearer ${STRAPI_KEY}` },
+      }
+    );
+
+    const user = userResponse.data?.data[0];
+
+    if (!user) {
+      console.error("Missing User Specs, Request aborted.");
+      return res.status(404).json({ message: '用户未找到，无法记录使用历史' });
+    }
+
+    const userId = user.documentId;
+    const consumptionRecord = user.ConsumptionRecord || []; // Get the records (new array for first one)
+    const sanitizedConsumptionRecord = consumptionRecord.map((record) => {
+      const { id, ...rest } = record; // Remove id
+      return rest;
+    });
+
+    // Step 2: Add a new entry to ConsumptionRecord
+    const newRecord = {
+      Consumer: member,
+      Provider: account,
+      Platform: 'MembershipDirect',
+      Time: new Date().toISOString(), 
+      Amount: amount,
+      AdditionalInfo: notes,
+    };
+
+    await axios.put(
+      `${STRAPI_API}/coupon-sys-accounts/${userId}`,
+      {
+        data: {
+          ConsumptionRecord: [...sanitizedConsumptionRecord, newRecord], // New record la
+        },
+      },
+      {
+        headers: { Authorization: `Bearer ${STRAPI_KEY}` },
+      }
+    );
+
+    logSuccess(200, `[CouponSys - MembershipDirect] Consumed ${amount} successfully for ${member}.`);
+    res.json({ message: '优惠券使用成功，并记录到用户历史！' });
+  } catch (error) {
+    console.error('Error using coupon:', error.message);
+    res.status(500).json({ message: '服务器错误' });
   }
 });
 
