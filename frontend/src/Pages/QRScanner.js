@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -79,6 +79,7 @@ const QRScanner = () => {
 
   const handleScan = async (data) => {
     if (!data) return;
+    if (scanResult !== '') return;
     setScanResult(data);
     setLoading(true);
 
@@ -139,12 +140,21 @@ const QRScanner = () => {
         <>
           <p className="text-green-500 mt-2 text-lg">{couponStatus.title}</p>
           <p className="text-gray-500 mt-1 text-sm">{couponStatus.description}</p>
-          <button
-            onClick={handleConfirmUse}
-            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            确认使用
-          </button>
+          <div className="mt-4 flex justify-center gap-4">
+            <button
+              onClick={() => setScanResult('')}
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            >
+              重新扫描
+            </button>
+
+            <button
+              onClick={handleConfirmUse}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              确认使用
+            </button>
+          </div>
         </>
       );
     }
