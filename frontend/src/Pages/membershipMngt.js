@@ -4,6 +4,7 @@ import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+const BACKEND_API = process.env.REACT_APP_BACKEND_API;
 const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -15,6 +16,16 @@ const MembershipManagement = () => {
   const [videoDevices, setVideoDevices] = useState([]);
   const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0);
   const [memberData, setMemberData] = useState(null);
+  const [showFreeUseModal, setShowFreeUseModal] = useState(false);
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState(false);
+
+  const [totalAmount, setTotalAmount] = useState(null);
+  const [deduction, setDeduction] = useState(null);
+  const [purpose, setPurpose] = useState('');
+
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const codeReaderRef = useRef(new BrowserMultiFormatReader());
@@ -66,6 +77,7 @@ const MembershipManagement = () => {
         codeReaderRef.current.reset();
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDeviceIndex]);
 
   const handleScan = async (data) => {
@@ -140,6 +152,90 @@ const MembershipManagement = () => {
     restartScanner();
   };
 
+  const handleDefaultDeduction = () => {
+    const half = Math.floor(totalAmount / 2);
+    setDeduction(Math.min(half, memberData.DiscountPoint));
+  };
+
+  const handleFinalSubmit = async () => {
+    setIsLoading(true);
+    try {
+      const res = await axios.get(`${API_ENDPOINT}/${MembershipField}?filters[Email][$eq]=${memberData.Email}`, {
+        headers: { Authorization: `Bearer ${API_KEY}` },
+        params: {
+          filters: {
+            Email: {
+              $eq: memberData.Email
+            }
+          }
+        }
+      });
+
+      const match = res.data?.data;
+      if (!match || match.length !== 1) throw new Error('未找到唯一会员');
+
+      const memberID = match[0].documentId;
+      const currentPoints = match[0].Point;
+      const currentDiscount = match[0].DiscountPoint;
+
+      const newPoints = currentPoints - totalAmount + deduction;
+      const newDiscount = currentDiscount - deduction;
+
+      // eslint-disable-next-line no-unused-vars
+      const { id, attributes: cleanData } = match[0];
+
+      console.log("Payload: ", 
+        {
+          ...cleanData,
+          Point: newPoints,
+          DiscountPoint: newDiscount
+        }
+      );
+
+      await axios.put(`${API_ENDPOINT}/${MembershipField}/${memberID.trim()}`, {
+        data: {
+          ...cleanData,
+          Point: newPoints,
+          DiscountPoint: newDiscount
+        }
+      }, {
+        headers: { Authorization: `Bearer ${API_KEY}` }
+      });
+
+      await axios.post(`${BACKEND_API}/record-md-deduction`, {
+        amount: totalAmount,
+        account: Cookies.get('username'),
+        member: memberData.Email,
+        notes: `${purpose}（Discounted: ${deduction}）`
+      });
+
+      setSuccessMsg(true);
+    } catch (err) {
+      console.error(err);
+      alert('提交失败，请检查网络或数据格式');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetAll = () => {
+    setShowFreeUseModal(false);
+    setShowConfirmModal(false);
+    setSuccessMsg(false);
+    setTotalAmount(0);
+    setDeduction(0);
+    setPurpose('');
+  };
+
+  const handleConfirmDetail = () => {
+    if (!totalAmount || !deduction || !purpose.trim()) {
+      alert('请完整填写所有字段');
+      return;
+    }
+    setShowConfirmModal(true);
+  };
+
+
   return (
     MembershipField && MembershipField === 'null' ?
       <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-700">
@@ -184,14 +280,150 @@ const MembershipManagement = () => {
             <p><strong>Email:</strong> {memberData.Email}</p>
             <p><strong>Expiry Date:</strong> {memberData.ExpiryDate}</p>
 
-            <div className="mt-4 overflow-y-auto">
-              {/* Placeholder for future functions */}
-              <div className="h-32 bg-gray-50 rounded border border-dashed flex items-center justify-center text-gray-400">
-                Additional Features Coming Soon...
-              </div>
+            <div className="mt-6 flex flex-col gap-4">
+              <button
+                onClick={() => setShowFreeUseModal(true)}
+                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded flex items-center justify-center"
+              >
+                <i className="bi bi-currency-dollar mr-2"></i> 自由消费
+              </button>
+
+              <button
+                disabled
+                className="bg-gray-400 text-white font-semibold py-2 px-4 rounded flex items-center justify-center opacity-60 cursor-not-allowed"
+              >
+                <i className="bi bi-box-seam mr-2"></i> 商品兑换
+              </button>
+
+              <button
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded flex items-center justify-center"
+              >
+                <i className="bi bi-check-circle mr-2"></i> 确认
+              </button>
             </div>
           </div>
         )}
+
+        {/* 自由消费弹窗 */}
+        {showFreeUseModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+            <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative animate-zoom-in">
+              <button
+                onClick={() => setShowFreeUseModal(false)}
+                className="absolute top-4 right-4 text-gray-500 text-xl"
+              >×</button>
+              <h2 className="text-xl font-bold mb-4">自由消费表单</h2>
+
+              <div className="mb-3">
+                <label className="block text-sm font-medium">Membership Number</label>
+                <input type="text" value={memberData.MembershipNumber} disabled className="w-full bg-gray-100 border rounded px-3 py-2 mt-1" />
+              </div>
+
+              <div className="mb-3">
+                <label className="block text-sm font-medium">Member Email</label>
+                <input type="text" value={memberData.Email} disabled className="w-full bg-gray-100 border rounded px-3 py-2 mt-1" />
+              </div>
+
+              <div className="mb-3">
+                <label className="block text-sm font-medium">Total Amounts</label>
+                <input
+                  type="number"
+                  value={totalAmount}
+                  onChange={(e) => setTotalAmount(Number(e.target.value))}
+                  max={memberData.Point + memberData.DiscountPoint}
+                  className="w-full border rounded px-3 py-2 mt-1"
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="block text-sm font-medium">Deduction</label>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="number"
+                    value={deduction}
+                    onChange={(e) => setDeduction(Number(e.target.value))}
+                    max={memberData.DiscountPoint}
+                    className="w-full border rounded px-3 py-2 mt-1"
+                  />
+                  <button className="bg-black text-white min-w-14 min-h-10 text-sm px-3 py-1 rounded mt-1" onClick={handleDefaultDeduction}>默认</button>
+                </div>
+              </div>
+
+              <div className="mb-3">
+                <label className="block text-sm font-medium">Purpose / Notes</label>
+                <textarea
+                  value={purpose}
+                  onChange={(e) => setPurpose(e.target.value)}
+                  maxLength={120}
+                  rows={2}
+                  className="w-full border rounded px-3 py-2 mt-1"
+                />
+              </div>
+
+              <div className="text-sm text-gray-700 mb-3">
+                点数: {memberData.Point} <i className="bi bi-arrow-right mx-2"></i> {memberData.Point - totalAmount + deduction}
+              </div>
+              <div className="text-sm text-gray-700 mb-3">
+                折扣点: {memberData.DiscountPoint} <i className="bi bi-arrow-right mx-2"></i> {memberData.DiscountPoint - deduction}
+              </div>
+
+              <button
+                onClick={handleConfirmDetail}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 flex items-center justify-center"
+              >
+                <i className="bi bi-send-check mr-2"></i> Confirm
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 二次确认弹窗 */}
+        {showConfirmModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
+            <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative animate-fade-in">
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                className="absolute top-4 right-4 text-gray-500 text-xl"
+              >×</button>
+              <h2 className="text-lg font-bold mb-4 text-center">
+                请交由会员进行确认
+              </h2>
+              <div className="text-sm text-gray-700 space-y-1 mb-4">
+                <p><strong>Membership:</strong> {memberData.MembershipNumber}</p>
+                <p><strong>Email:</strong> {memberData.Email}</p>
+                <p><strong>会员点:</strong> {memberData.Point} → {memberData.Point - totalAmount + deduction}</p>
+                <p><strong>折扣点:</strong> {memberData.DiscountPoint} → {memberData.DiscountPoint - deduction}</p>
+              </div>
+              <button
+                onClick={handleFinalSubmit}
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center"
+              >
+                <i className="bi bi-check2-circle mr-2"></i> I confirm this purchase
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 黑幕 Loading 状态 */}
+        {isLoading && (
+          <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+            <div className="text-center">
+              <div className="spinner-border animate-spin inline-block w-12 h-12 border-4 border-white rounded-full" role="status"></div>
+              <p className="text-white mt-4">处理中，请稍候...</p>
+            </div>
+          </div>
+        )}
+
+        {/* 成功提示 */}
+        {successMsg && (
+          <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50" onClick={resetAll}>
+            <div className="bg-white rounded-lg shadow-lg px-6 py-4 flex flex-col items-center animate-zoom-in">
+              <i className="bi bi-check-circle-fill text-green-500 text-4xl mb-2"></i>
+              <p className="text-green-700 font-semibold">兑换成功！信息已更新。</p>
+            </div>
+          </div>
+        )}
+
       </div>
   );
 };
