@@ -188,14 +188,6 @@ const MembershipManagement = () => {
       // eslint-disable-next-line no-unused-vars
       const { id, attributes: cleanData } = match[0];
 
-      console.log("Payload: ",
-        {
-          ...cleanData,
-          Point: newPoints,
-          DiscountPoint: newDiscount
-        }
-      );
-
       await axios.put(`${API_ENDPOINT}/${MembershipField}/${memberID.trim()}`, {
         data: {
           ...cleanData,
@@ -208,8 +200,10 @@ const MembershipManagement = () => {
 
       await axios.post(`${BACKEND_API}/record-md-deduction`, {
         amount: totalAmount,
+        discount: deduction,
         account: Cookies.get('username'),
-        member: memberData.Email,
+        member_name: memberData.UserName ? memberData.UserName : memberData.Name,
+        member_email: memberData.Email,
         notes: `${purpose}（Discounted: ${deduction}）`
       });
 
@@ -229,6 +223,7 @@ const MembershipManagement = () => {
     setTotalAmount(0);
     setDeduction(0);
     setPurpose('');
+    closeDetails();
   };
 
   const handleConfirmDetail = () => {
@@ -309,7 +304,7 @@ const MembershipManagement = () => {
               </button> */}
 
               <button
-                onClick={() => setShowFreeUseModal(true)}
+                onClick={closeDetails}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded flex items-center justify-center"
               >
                 <i className="bi bi-check-circle mr-2"></i> 确认
