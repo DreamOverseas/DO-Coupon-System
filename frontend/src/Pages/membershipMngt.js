@@ -30,9 +30,9 @@ const MembershipManagement = () => {
   const streamRef = useRef(null);
   const codeReaderRef = useRef(new BrowserMultiFormatReader());
 
-  const isInvalidBalance =
+  const isInvalidBalance = memberData && (
     memberData.DiscountPoint - deduction < 0 ||
-    memberData.Point - totalAmount + deduction < 0;
+    memberData.Point - totalAmount + deduction < 0);
 
   useEffect(() => {
     const initScanner = async () => {
@@ -236,6 +236,14 @@ const MembershipManagement = () => {
       alert('请完整填写所有字段');
       return;
     }
+    if (deduction === 0 && totalAmount === 0) {
+      alert('请至少更改任一数值！');
+      return;
+    }
+    if (deduction < 0 || totalAmount < 0) {
+      alert('非法数据！');
+      return;
+    }
     setShowConfirmModal(true);
   };
 
@@ -283,6 +291,7 @@ const MembershipManagement = () => {
             <p><strong>Membership Number:</strong> {memberData.MembershipNumber}</p>
             <p><strong>Email:</strong> {memberData.Email}</p>
             <p><strong>Expiry Date:</strong> {memberData.ExpiryDate}</p>
+            <p><strong>Current Balance:</strong> {memberData.Point} + {memberData.DiscountPoint}</p>
 
             <div className="mt-6 flex flex-col gap-4">
               <button
@@ -292,14 +301,15 @@ const MembershipManagement = () => {
                 <i className="bi bi-currency-dollar mr-2"></i> 自由消费
               </button>
 
-              <button
+              {/* <button
                 disabled
                 className="bg-gray-400 text-white font-semibold py-2 px-4 rounded flex items-center justify-center opacity-60 cursor-not-allowed"
               >
                 <i className="bi bi-box-seam mr-2"></i> 商品兑换
-              </button>
+              </button> */}
 
               <button
+                onClick={() => setShowFreeUseModal(true)}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded flex items-center justify-center"
               >
                 <i className="bi bi-check-circle mr-2"></i> 确认
@@ -335,6 +345,7 @@ const MembershipManagement = () => {
                   value={totalAmount}
                   onChange={(e) => setTotalAmount(Number(e.target.value))}
                   max={memberData.Point + memberData.DiscountPoint}
+                  min={0}
                   className="w-full border rounded px-3 py-2 mt-1"
                 />
               </div>
@@ -347,6 +358,7 @@ const MembershipManagement = () => {
                     value={deduction}
                     onChange={(e) => setDeduction(Number(e.target.value))}
                     max={memberData.DiscountPoint}
+                    min={0}
                     className="w-full border rounded px-3 py-2 mt-1"
                   />
                   <button className="bg-black text-white min-w-14 min-h-10 text-sm px-3 py-1 rounded mt-1" onClick={handleDefaultDeduction}>默认</button>
