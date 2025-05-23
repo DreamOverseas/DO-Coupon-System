@@ -39,6 +39,7 @@ app.use(bodyParser.json());
 
 const STRAPI_API = process.env.STRAPI_API;
 const STRAPI_KEY = process.env.STRAPI_KEY;
+const EMAIL_API_ENDPOINT = process.env.EMAIL_API_ENDPOINT;
 
 // Function that gets all coupons from backend for a specific username
 const getAllCoupons = async (username) => {
@@ -330,17 +331,18 @@ app.post('/create-active-coupon', async (req, res) => {
  * This is the API designed for the Coupon System frontend, to use Coupon by its Hash code from the provider's QR scan
  * @params amount -> the number of point consumed (addition of Membership p & Discount p)
  * @params account -> the account name of the Coupon Sys
- * @returns member -> member whose points is being consumed
+ * @returns member_name -> member name whose points is being consumed
+ * @returns member_email -> member's email to send notification
  * @returns notes -> Chinese explanation for the successful or not and for viewing in frontend
  */
 app.post('/record-md-deduction', async (req, res) => {
-  const { amount, account, member, notes } = req.body;
+  const { amount, discount, account, member_name, member_email, notes } = req.body;
 
-  if (!amount) {
+  if (!amount || !discount) {
     return res.status(400).json({ message: 'How much consumed is NeSseSarY!' });
   }
 
-  if (!account || !member) {
+  if (!account || !member_name || !member_email) {
     return res.status(400).json({ message: 'System account & Member detail is required!' });
   }
 
@@ -369,7 +371,7 @@ app.post('/record-md-deduction', async (req, res) => {
 
     // Step 2: Add a new entry to ConsumptionRecord
     const newRecord = {
-      Consumer: member,
+      Consumer: member_name,
       Provider: account,
       Platform: 'MembershipDirect',
       Time: new Date().toISOString(), 
@@ -392,10 +394,26 @@ app.post('/record-md-deduction', async (req, res) => {
       }
     );
 
-    logSuccess(200, `[CouponSys - MembershipDirect] Consumed ${amount} successfully for ${member}.`);
+    // Step 3: Send a notification Email
+    await axios.post(
+      `${EMAIL_API_ENDPOINT}/member-direct-notify`,
+      {
+        name: member_name,
+        email: member_email,
+        account: "WCO",
+        point: amount,
+        discount: discount,
+        info: notes
+      },
+      { headers: {
+        "Content-Type": "application/json"
+      }}
+    );
+
+    logSuccess(200, `[CouponSys - MembershipDirect] Consumed ${amount} successfully for ${member_name}`);
     res.json({ message: '成功，已记录到用户历史！' });
   } catch (error) {
-    console.error('Error Ocuured - ', error.response?.data);
+    console.error('Error Ocuured - ', error);
     res.status(500).json({ message: '服务器宕机辣' });
   }
 });
