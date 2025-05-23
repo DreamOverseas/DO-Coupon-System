@@ -30,6 +30,10 @@ const MembershipManagement = () => {
   const streamRef = useRef(null);
   const codeReaderRef = useRef(new BrowserMultiFormatReader());
 
+  const isInvalidBalance =
+    memberData.DiscountPoint - deduction < 0 ||
+    memberData.Point - totalAmount + deduction < 0;
+
   useEffect(() => {
     const initScanner = async () => {
       const hints = new Map();
@@ -184,7 +188,7 @@ const MembershipManagement = () => {
       // eslint-disable-next-line no-unused-vars
       const { id, attributes: cleanData } = match[0];
 
-      console.log("Payload: ", 
+      console.log("Payload: ",
         {
           ...cleanData,
           Point: newPoints,
@@ -369,7 +373,12 @@ const MembershipManagement = () => {
 
               <button
                 onClick={handleConfirmDetail}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 flex items-center justify-center"
+                disabled={isInvalidBalance}
+                className={`w-full font-bold py-2 px-4 rounded mt-4 flex items-center justify-center 
+    ${isInvalidBalance
+                    ? 'bg-gray-400 text-white cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'}
+  `}
               >
                 <i className="bi bi-send-check mr-2"></i> Confirm
               </button>
