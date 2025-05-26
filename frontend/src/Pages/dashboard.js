@@ -83,7 +83,7 @@ const Dashboard = () => {
                     className="flex flex-col items-center text-xs focus:outline-none"
                     onClick={() => setActiveTab('scanner')}
                 >
-                    <i className={`bi bi-qr-code-scan text-lg transition-opacity ${activeTab === 'scanner' ? 'text-blue-400' : 'text-white'}`}></i>
+                    <i className={`bi bi-qr-code-scan text-2xl transition-opacity ${activeTab === 'scanner' ? 'text-blue-400' : 'text-white'}`}></i>
                     <p className={`mt-1 hidden sm:block ${activeTab === 'scanner' ? 'font-bold' : 'font-normal'}`}>扫描卡券 / Scan Coupon</p>
                 </button>
 

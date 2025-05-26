@@ -283,18 +283,19 @@ const MembershipManagement = () => {
               <h2 className="text-xl font-bold text-center w-full">Member Details</h2>
               <button onClick={closeDetails} className="text-gray-500 text-xl absolute top-4 right-4">×</button>
             </div>
-            <p><strong>Member:</strong> {memberData.UserName ? memberData.UserName : memberData.Name}</p>
-            <p><strong>Membership Number:</strong> {memberData.MembershipNumber}</p>
-            <p><strong>Email:</strong> {memberData.Email}</p>
-            <p><strong>Expiry Date:</strong> {memberData.ExpiryDate}</p>
-            <p><strong>Current Balance:</strong> {memberData.Point} + {memberData.DiscountPoint}</p>
+
+            <p><strong>Member 会员:</strong> {memberData.UserName ? memberData.UserName : memberData.Name}</p>
+            <p><strong>Membership Number 会员号:</strong> {memberData.MembershipNumber}</p>
+            <p><strong>Email 电子邮箱:</strong> {memberData.Email}</p>
+            <p><strong>Expiry Date 到期日:</strong> {memberData.ExpiryDate}</p>
+            <p><strong>DO Point 会员点 (余额+折扣点):</strong> {memberData.Point} + {memberData.DiscountPoint}</p>
 
             <div className="mt-6 flex flex-col gap-4">
               <button
                 onClick={() => setShowFreeUseModal(true)}
                 className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded flex items-center justify-center"
               >
-                <i className="bi bi-currency-dollar mr-2"></i> 自由消费
+                <i className="bi bi-currency-dollar mr-2"></i> Member-Direct 自由消费
               </button>
 
               {/* <button
@@ -308,7 +309,7 @@ const MembershipManagement = () => {
                 onClick={closeDetails}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded flex items-center justify-center"
               >
-                <i className="bi bi-check-circle mr-2"></i> 确认
+                <i className="bi bi-check-circle mr-2"></i> Comfirm 确认
               </button>
             </div>
           </div>
@@ -324,18 +325,18 @@ const MembershipManagement = () => {
               >×</button>
               <h2 className="text-xl font-bold mb-4">Membership Direct | 自由消费</h2>
 
-              <div className="mb-3">
-                <label className="block text-sm font-medium">Membership Number</label>
+              <div className="mb-3 text-left">
+                <label className="block text-sm font-medium">Membership Number | 会员号</label>
                 <input type="text" value={memberData.MembershipNumber} disabled className="w-full bg-gray-100 border rounded px-3 py-2 mt-1" />
               </div>
 
-              <div className="mb-3">
-                <label className="block text-sm font-medium">Member Email</label>
+              <div className="mb-3 text-left">
+                <label className="block text-sm font-medium">Member Email | 电子邮箱</label>
                 <input type="text" value={memberData.Email} disabled className="w-full bg-gray-100 border rounded px-3 py-2 mt-1" />
               </div>
 
-              <div className="mb-3">
-                <label className="block text-sm font-medium">Total Amounts</label>
+              <div className="mb-3 text-left">
+                <label className="block text-sm font-medium">Total Amounts | 总价</label>
                 <input
                   type="number"
                   value={totalAmount}
@@ -346,8 +347,8 @@ const MembershipManagement = () => {
                 />
               </div>
 
-              <div className="mb-3">
-                <label className="block text-sm font-medium">Deduction</label>
+              <div className="mb-3 text-left">
+                <label className="block text-sm font-medium">Deduction | 折扣值</label>
                 <div className="flex gap-2 items-center">
                   <input
                     type="number"
@@ -361,8 +362,8 @@ const MembershipManagement = () => {
                 </div>
               </div>
 
-              <div className="mb-3">
-                <label className="block text-sm font-medium">Purpose / Notes</label>
+              <div className="mb-3 text-left">
+                <label className="block text-sm font-medium">Purpose / Notes | 商品 / 备注</label>
                 <textarea
                   value={purpose}
                   onChange={(e) => setPurpose(e.target.value)}
@@ -373,10 +374,10 @@ const MembershipManagement = () => {
               </div>
 
               <div className="text-sm text-gray-700 mb-3">
-                点数: {memberData.Point} <i className="bi bi-arrow-right mx-2"></i> {memberData.Point - totalAmount + deduction}
+                Balance | 余额: {memberData.Point} <i className="bi bi-arrow-right mx-2"></i> {memberData.Point - totalAmount + deduction}
               </div>
               <div className="text-sm text-gray-700 mb-3">
-                折扣点: {memberData.DiscountPoint} <i className="bi bi-arrow-right mx-2"></i> {memberData.DiscountPoint - deduction}
+                Discount Point | 折扣点: {memberData.DiscountPoint} <i className="bi bi-arrow-right mx-2"></i> {memberData.DiscountPoint - deduction}
               </div>
 
               <button
@@ -388,7 +389,7 @@ const MembershipManagement = () => {
                     : 'bg-blue-600 hover:bg-blue-700 text-white'}
   `}
               >
-                <i className="bi bi-send-check mr-2"></i> Confirm
+                <i className="bi bi-send-check mr-2"></i> Confirm | 确认
               </button>
             </div>
           </div>
@@ -403,19 +404,22 @@ const MembershipManagement = () => {
                 className="absolute top-4 right-4 text-gray-500 text-xl"
               >×</button>
               <h2 className="text-lg font-bold mb-4 text-center">
+                Final comfirmation by MEMBER <br/>
                 请交由会员进行确认
               </h2>
-              <div className="text-sm text-gray-700 space-y-1 mb-4">
-                <p><strong>Membership:</strong> {memberData.MembershipNumber}</p>
-                <p><strong>Email:</strong> {memberData.Email}</p>
-                <p><strong>会员点:</strong> {memberData.Point} → {memberData.Point - totalAmount + deduction}</p>
-                <p><strong>折扣点:</strong> {memberData.DiscountPoint} → {memberData.DiscountPoint - deduction}</p>
+              <div className="text-sm text-gray-700 space-y-1 mb-4 text-left">
+                <p><strong>Member | 会员:</strong> {memberData.UserName ? memberData.UserName : memberData.Name}</p>
+                <p><strong>Membership Number | 会员号:</strong> {memberData.MembershipNumber}</p>
+                <p><strong>Email | 电子邮箱:</strong> {memberData.Email}</p>
+                <p><strong>DO Point | 会员点:</strong> {memberData.Point + memberData.DiscountPoint} → {memberData.Point + memberData.DiscountPoint - totalAmount}</p>
+                <p><strong> &gt; Balance | 余额:</strong> {memberData.Point} → {memberData.Point - totalAmount + deduction}</p>
+                <p><strong> &gt; Dicount Point | 折扣点:</strong> {memberData.DiscountPoint} → {memberData.DiscountPoint - deduction}</p>
               </div>
               <button
                 onClick={handleFinalSubmit}
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center"
               >
-                <i className="bi bi-check2-circle mr-2"></i> I confirm this purchase
+                <i className="bi bi-check2-circle mr-2"></i> I confirm this purchase | 确认兑换
               </button>
             </div>
           </div>
@@ -426,6 +430,7 @@ const MembershipManagement = () => {
           <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
             <div className="text-center">
               <div className="spinner-border animate-spin inline-block w-12 h-12 border-4 border-white rounded-full" role="status"></div>
+              <p className="text-white mt-4">Processing...</p>
               <p className="text-white mt-4">处理中，请稍候...</p>
             </div>
           </div>
@@ -436,6 +441,7 @@ const MembershipManagement = () => {
           <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50" onClick={resetAll}>
             <div className="bg-white rounded-lg shadow-lg px-6 py-4 flex flex-col items-center animate-zoom-in">
               <i className="bi bi-check-circle-fill text-green-500 text-4xl mb-2"></i>
+              <p className="text-green-700 font-semibold">Redeem accomplished! You info's been updated.</p>
               <p className="text-green-700 font-semibold">兑换成功！信息已更新。</p>
             </div>
           </div>
