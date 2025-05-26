@@ -47,7 +47,7 @@ const MembershipManagement = () => {
 
         const selectedDeviceId = videoInputDevices[currentDeviceIndex]?.deviceId;
         if (!selectedDeviceId) {
-          setErrorMsg('摄像头未检测到，请检查设备摄像头访问权限');
+          setErrorMsg('未检测到摄像头，请检查设备权限。');
           return;
         }
 
@@ -283,6 +283,7 @@ const MembershipManagement = () => {
               <h2 className="text-xl font-bold text-center w-full">Member Details</h2>
               <button onClick={closeDetails} className="text-gray-500 text-xl absolute top-4 right-4">×</button>
             </div>
+            <p><strong>Member:</strong> {memberData.UserName ? memberData.UserName : memberData.Name}</p>
             <p><strong>Membership Number:</strong> {memberData.MembershipNumber}</p>
             <p><strong>Email:</strong> {memberData.Email}</p>
             <p><strong>Expiry Date:</strong> {memberData.ExpiryDate}</p>
@@ -313,7 +314,7 @@ const MembershipManagement = () => {
           </div>
         )}
 
-        {/* 自由消费弹窗 */}
+        {/* Modal FOr Membership Direct */}
         {showFreeUseModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
             <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative animate-zoom-in">
@@ -321,7 +322,7 @@ const MembershipManagement = () => {
                 onClick={() => setShowFreeUseModal(false)}
                 className="absolute top-4 right-4 text-gray-500 text-xl"
               >×</button>
-              <h2 className="text-xl font-bold mb-4">自由消费表单</h2>
+              <h2 className="text-xl font-bold mb-4">Membership Direct | 自由消费</h2>
 
               <div className="mb-3">
                 <label className="block text-sm font-medium">Membership Number</label>
@@ -393,7 +394,7 @@ const MembershipManagement = () => {
           </div>
         )}
 
-        {/* 二次确认弹窗 */}
+        {/* Comfirmation for Member */}
         {showConfirmModal && (
           <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
             <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative animate-fade-in">
@@ -420,7 +421,7 @@ const MembershipManagement = () => {
           </div>
         )}
 
-        {/* 黑幕 Loading 状态 */}
+        {/* Loading  */}
         {isLoading && (
           <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
             <div className="text-center">
@@ -430,7 +431,7 @@ const MembershipManagement = () => {
           </div>
         )}
 
-        {/* 成功提示 */}
+        {/* Success */}
         {successMsg && (
           <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50" onClick={resetAll}>
             <div className="bg-white rounded-lg shadow-lg px-6 py-4 flex flex-col items-center animate-zoom-in">

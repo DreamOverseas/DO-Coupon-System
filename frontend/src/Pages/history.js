@@ -55,7 +55,7 @@ const History = () => {
     <div className="p-4 h-full flex flex-col">
       <h1 className="text-2xl font-bold mb-4">卡券使用历史 / Coupon History</h1>
 
-      {/* 搜索框 */}
+      {/* Search Inputtin' field */}
       <input
         type="text"
         placeholder="Search/搜索记录..."
@@ -64,7 +64,7 @@ const History = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      {/* 历史记录列表 */}
+      {/* History */}
       <div className="flex-1 overflow-y-auto bg-gray-50 p-4 rounded shadow-inner">
         {filteredRecords.length === 0 ? (
           <div className="text-center mt-10">

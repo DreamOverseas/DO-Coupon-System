@@ -73,7 +73,7 @@ const Overview = () => {
 
   return (
     <div className="p-4">
-      {/* 搜索和过滤选项 */}
+      {/* Search n filter */}
       <div className="flex justify-between items-center mb-4">
         <input
           type="text"
@@ -93,7 +93,7 @@ const Overview = () => {
         </label>
       </div>
 
-      {/* 卡券展示区域 */}
+      {/* displays all coupons */}
       {filteredCoupons.length === 0 ? (
         <div className="text-center mt-10">
           <p className="text-xl font-bold">暂无卡券数据</p>
@@ -129,7 +129,7 @@ const Overview = () => {
         </div>
       )}
 
-      {/* 分页 */}
+      {/* Pagenation */}
       {totalPages > 1 && (
         <div className="mt-4 flex justify-center items-center space-x-2">
           {[...Array(totalPages)].map((_, index) => (

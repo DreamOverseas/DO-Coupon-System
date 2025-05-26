@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { BrowserMultiFormatReader } from '@zxing/browser';
+import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
@@ -9,7 +10,7 @@ const QRScanner = () => {
   const [couponStatus, setCouponStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [videoDevices, setVideoDevices] = useState([]);
-  const [currentDeviceIndex, setCurrentDeviceIndex] = useState(1); // Default to the 2nd one
+  const [currentDeviceIndex, setCurrentDeviceIndex] = useState(1);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
 
@@ -18,7 +19,9 @@ const QRScanner = () => {
 
   useEffect(() => {
     const initScanner = async () => {
-      const codeReader = new BrowserMultiFormatReader();
+      const hints = new Map();
+      hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.QR_CODE]);
+      const codeReader = new BrowserMultiFormatReader(hints);
 
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
@@ -75,7 +78,7 @@ const QRScanner = () => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentDeviceIndex]); // 监听设备索引的变化，切换设备时重新初始化
+  }, [currentDeviceIndex]);
 
   const handleScan = async (data) => {
     if (!data) return;
@@ -107,9 +110,9 @@ const QRScanner = () => {
   };
 
   const handleSwitchCamera = async () => {
-    if (videoDevices.length <= 1) return; // 没有更多设备可切换
+    if (videoDevices.length <= 1) return;
 
-    const nextDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length; // 循环切换设备
+    const nextDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length; // Loop thru available device
     setCurrentDeviceIndex(nextDeviceIndex);
   };
 
