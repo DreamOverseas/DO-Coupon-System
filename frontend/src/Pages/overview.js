@@ -13,7 +13,7 @@ const Overview = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const ITEMS_PER_PAGE = 12;
+  const ITEMS_PER_PAGE = 9;
   const username = Cookies.get('username');
 
   useEffect(() => {
@@ -107,7 +107,7 @@ const Overview = () => {
               className="border rounded shadow p-4 flex flex-col"
             >
               <h2 className="text-lg font-bold">{coupon.Title}</h2>
-              <p className="text-sm text-gray-500">{coupon.Description}</p>
+              <p className="text-sm text-gray-500 max-h-[75px] overflow-y-auto">{coupon.Description}</p>
               <hr className="my-2" />
               <div className="flex justify-between items-center">
                 <p className="text-sm text-gray-700">Assigned to: {coupon.AssignedTo}</p>

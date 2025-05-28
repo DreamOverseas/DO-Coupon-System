@@ -75,7 +75,7 @@ const Dashboard = () => {
                     className="flex flex-col items-center text-xs focus:outline-none"
                     onClick={() => setActiveTab('overview')}
                 >
-                    <i className={`bi bi-view-list text-lg transition-opacity ${activeTab === 'overview' ? 'text-lime-400' : 'text-white'}`}></i>
+                    <i className={`bi bi-view-list text-2xl transition-opacity ${activeTab === 'overview' ? 'text-lime-400' : 'text-white'}`}></i>
                     <p className={`mt-1 hidden sm:block ${activeTab === 'overview' ? 'font-bold' : 'font-normal'}`}>卡券一览 / Coupon Overview</p>
                 </button>
 
@@ -92,7 +92,7 @@ const Dashboard = () => {
                         className="flex flex-col items-center text-xs focus:outline-none"
                         onClick={() => setActiveTab('membership')}
                     >
-                        <i className={`bi bi-person-bounding-box text-lg transition-opacity ${activeTab === 'membership' ? 'text-violet-400' : 'text-white'}`}></i>
+                        <i className={`bi bi-person-bounding-box text-2xl transition-opacity ${activeTab === 'membership' ? 'text-violet-400' : 'text-white'}`}></i>
                         <p className={`mt-1 hidden sm:block ${activeTab === 'membership' ? 'font-bold' : 'font-normal'}`}>会员验证 / Membership Verify</p>
                     </button>
                 )}
@@ -101,7 +101,7 @@ const Dashboard = () => {
                     className="flex flex-col items-center text-xs focus:outline-none"
                     onClick={() => setActiveTab('history')}
                 >
-                    <i className={`bi bi-clock-history text-lg transition-opacity ${activeTab === 'history' ? 'text-amber-300' : 'text-white'}`}></i>
+                    <i className={`bi bi-clock-history text-2xl transition-opacity ${activeTab === 'history' ? 'text-amber-300' : 'text-white'}`}></i>
                     <p className={`mt-1 hidden sm:block ${activeTab === 'history' ? 'font-bold' : 'font-normal'}`}>使用历史 / Coupon History</p>
                 </button>
             </footer>

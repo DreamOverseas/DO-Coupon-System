@@ -142,7 +142,7 @@ const QRScanner = () => {
       return (
         <>
           <p className="text-green-500 mt-2 text-lg">{couponStatus.title}</p>
-          <p className="text-gray-500 mt-1 text-sm max-h-[50px] overflow-y-auto">
+          <p className="text-gray-500 mt-1 text-sm max-h-[75px] overflow-y-auto">
             {couponStatus.description}
           </p>
           <div className="mt-4 flex justify-center gap-4">
