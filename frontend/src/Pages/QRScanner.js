@@ -8,7 +8,6 @@ const QRScanner = () => {
   const [scanResult, setScanResult] = useState('');
   const [error, setError] = useState(null);
   const [couponStatus, setCouponStatus] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [videoDevices, setVideoDevices] = useState([]);
   const [currentDeviceIndex, setCurrentDeviceIndex] = useState(1);
   const videoRef = useRef(null);
@@ -84,16 +83,13 @@ const QRScanner = () => {
     if (!data) return;
     if (scanResult !== '') return;
     setScanResult(data);
-    setLoading(true);
 
     try {
-      const response = await axios.post(`${BACKEND_API}/validate-coupon`, { hash: data, username });
+      const response = await axios.post(`${BACKEND_API}/validate-coupon`, { hash: data });
       setCouponStatus(response.data);
     } catch (error) {
       console.error('验证失败:', `尝试连接${BACKEND_API}/validate-coupon`, error);
       setCouponStatus({ status: 'invalid', message: '与云端失去连接，请尝试其他验证方法' });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -172,9 +168,9 @@ const QRScanner = () => {
 
       <h1 className="text-2xl font-bold mb-4">扫描二维码 / Scan QR</h1>
       <div className="w-full max-w-md bg-white p-4 shadow rounded">
-        <video ref={videoRef} className="w-full" muted />
-        {scanResult && !loading && renderIcon()}
-        {scanResult && !loading && renderCouponDetails()}
+        <video ref={videoRef} className="w-full max-h-50" muted />
+        {scanResult && renderIcon()}
+        {scanResult && renderCouponDetails()}
         {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
       <button

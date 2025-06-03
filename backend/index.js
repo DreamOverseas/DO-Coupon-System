@@ -130,18 +130,22 @@ app.post('/login', async (req, res) => {
  * @returns message -> Chinese explation for the status and for viewing in frontend
  */
 app.post('/validate-coupon', async (req, res) => {
-  const { hash, username } = req.body;
+  const { hash } = req.body;
 
-  if (!hash || !username) {
+  if (!hash) {
     console.error("Missing Request Argument(s). Request aborted.");
     return res.status(400).json({ status: 'invalid', message: '无效请求，可能缺失请求内容' });
   }
 
   try {
-    const coupons = await getAllCoupons(username);
-    const coupon = coupons.find((item) => item.Hash === hash);
+    // Send request to backend with Hash filter
+    const response = await axios.get(`${STRAPI_API}/coupons?filters[Hash][$eq]=${hash}`, {
+      headers: { Authorization: `Bearer ${STRAPI_KEY}` },
+    });
 
-    if (!coupon) {
+    const coupon = response.data?.data[0];
+
+    if (!coupon || coupon == null || coupon == undefined) {
       console.log(`Got Coupon Hash ${hash}, not found in all coupons.`);
       return res.json({ status: 'invalid', message: '无效二维码' });
     }
@@ -165,7 +169,8 @@ app.post('/validate-coupon', async (req, res) => {
     res.json({
       status: 'valid',
       message: 'Coupon is valid.',
-      title: coupon.Title
+      title: coupon.Title,
+      description: coupon.Description
     });
   } catch (error) {
     console.log(error);

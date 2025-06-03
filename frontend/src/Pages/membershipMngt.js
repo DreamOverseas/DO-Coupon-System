@@ -256,7 +256,7 @@ const MembershipManagement = () => {
         <h1 className="text-2xl font-bold mb-4">Scan Membership QR Code</h1>
 
         <div className="w-full max-w-sm bg-white p-4 shadow rounded">
-          <video ref={videoRef} className="w-full" muted></video>
+          <video ref={videoRef} className="w-full max-h-50" muted></video>
         </div>
 
         <button
