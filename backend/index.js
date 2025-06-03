@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const crypto = require('crypto');
 const axios = require('axios');
 const cors = require('cors');
 const app = express();
@@ -141,27 +142,30 @@ app.post('/validate-coupon', async (req, res) => {
     const coupon = coupons.find((item) => item.Hash === hash);
 
     if (!coupon) {
+      console.log(`Got Coupon Hash ${hash}, not found in all coupons.`);
       return res.json({ status: 'invalid', message: '无效二维码' });
     }
 
     if (new Date(coupon.Expiry) < new Date()) {
+      console.log(`Got Coupon with Hash ${hash} is already expired.`);
       return res.json({ status: 'expired', message: '优惠券已过期' });
     }
 
     if (coupon.UsesLeft <= 0) {
+      console.log(`Got Coupon with Hash ${hash} is already exausted.`);
       return res.json({ status: 'used', message: '优惠券已使用完毕' });
     }
 
     if (!coupon.Active) {
+      console.log(`Got Coupon with Hash ${hash} is not active.`);
       return res.json({ status: 'inactive', message: '优惠券已失效' });
     }
 
     logSuccess(200, "Coupon Validation Passed");
     res.json({
       status: 'valid',
-      message: '优惠券有效',
-      title: coupon.Title,
-      description: coupon.Description,
+      message: 'Coupon is valid.',
+      title: coupon.Title
     });
   } catch (error) {
     console.log(error);
@@ -288,6 +292,7 @@ app.post('/create-active-coupon', async (req, res) => {
       AssignedFrom: assigned_from,
       AssignedTo: assigned_to,
       Active: true,
+      Hash: crypto.randomBytes(16).toString('hex'),
       Email: email,
       Contact: contact
     }
