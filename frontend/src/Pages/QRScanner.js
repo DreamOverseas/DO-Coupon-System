@@ -168,7 +168,24 @@ const QRScanner = () => {
 
       <h1 className="text-2xl font-bold mb-4">扫描二维码 / Scan QR</h1>
       <div className="w-full max-w-md bg-white p-4 shadow rounded">
-        <video ref={videoRef} className="w-full max-h-50" muted />
+        <div className="relative w-full max-w-md mx-auto">
+          <video
+            ref={videoRef}
+            className="w-full aspect-square object-cover bg-black"
+            muted
+          />
+          <svg
+            className="absolute inset-0 w-full h-full text-amber-200 opacity-50 pointer-events-none"
+            viewBox="0 0 200 200"
+            fill="none"
+            stroke="currentColor"
+          >
+            <path d="M20 50 V20 H50" strokeWidth="4" />
+            <path d="M150 20 H180 V50" strokeWidth="4" />
+            <path d="M180 150 V180 H150" strokeWidth="4" />
+            <path d="M50 180 H20 V150" strokeWidth="4" />
+          </svg>
+        </div>
         {scanResult && renderIcon()}
         {scanResult && renderCouponDetails()}
         {error && <p className="text-red-500 mt-4">{error}</p>}
