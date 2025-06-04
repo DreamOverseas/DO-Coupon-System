@@ -10,7 +10,7 @@ const CouponPage = () => {
   const [sortField, setSortField] = useState('Title');
   const [sortOrder, setSortOrder] = useState('asc');
   const [currentPage, setCurrentPage] = useState(1);
-  const [showActiveOnly, setShowActiveOnly] = useState(false);
+  const [showActiveOnly, setShowActiveOnly] = useState(true);
   const itemsPerPage = 12;
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -102,7 +102,7 @@ const CouponPage = () => {
       <header className="bg-white shadow p-4 flex items-center justify-between md:justify-start md:gap-4">
         <div className="flex items-center gap-4">
           <img src="/logo512.png" alt="Logo" className="w-12 h-12" />
-          <h1 className="text-xl font-bold">DO Coupon System</h1>
+          <h1 className="text-xl font-bold">DO Coupon System ADMIN</h1>
         </div>
         <div className="flex-1 hidden md:flex justify-between items-center">
           <div className="flex gap-4">
@@ -230,7 +230,7 @@ const CouponPage = () => {
           >
             <div>
               <h3 className="text-lg font-bold">{coupon.Title}</h3>
-              <p className="text-sm text-gray-600">{coupon.Description}</p>
+              <p className="text-sm text-gray-600 max-h-16 overflow-auto">{coupon.Description}</p>
             </div>
             <hr className="my-2" />
             <div className="flex justify-between items-center">
