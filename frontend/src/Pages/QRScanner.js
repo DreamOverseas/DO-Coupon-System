@@ -85,7 +85,7 @@ const QRScanner = () => {
     setScanResult(data);
 
     try {
-      const response = await axios.post(`${BACKEND_API}/validate-coupon`, { hash: data });
+      const response = await axios.post(`${BACKEND_API}/validate-coupon`, { hash: data, provider: username });
       setCouponStatus(response.data);
     } catch (error) {
       console.error('验证失败:', `尝试连接${BACKEND_API}/validate-coupon`, error);

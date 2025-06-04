@@ -130,16 +130,16 @@ app.post('/login', async (req, res) => {
  * @returns message -> Chinese explation for the status and for viewing in frontend
  */
 app.post('/validate-coupon', async (req, res) => {
-  const { hash } = req.body;
+  const { hash, provider } = req.body;
 
-  if (!hash) {
+  if (!hash || !provider ) {
     console.error("Missing Request Argument(s). Request aborted.");
     return res.status(400).json({ status: 'invalid', message: '无效请求，可能缺失请求内容' });
   }
 
   try {
     // Send request to backend with Hash filter
-    const response = await axios.get(`${STRAPI_API}/coupons?filters[Hash][$eq]=${hash}`, {
+    const response = await axios.get(`${STRAPI_API}/coupons?filters[Hash][$eq]=${hash}&filters[AssignedFrom][$eq]=${provider}`, {
       headers: { Authorization: `Bearer ${STRAPI_KEY}` },
     });
 
