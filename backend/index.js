@@ -62,6 +62,27 @@ const getAllCoupons = async (username) => {
   }
 };
 
+// Function that set coupon to inactivity
+const deactivateCoupon = async (coupon) => {
+  try {
+    const couponId = coupon.documentId;
+      await axios.put(
+        `${STRAPI_API}/coupons/${couponId}`,
+        {
+          data: {
+            Active: false
+          },
+        },
+        {
+          headers: { Authorization: `Bearer ${STRAPI_KEY}` },
+        }
+      );
+  } catch (error) {
+    console.error('更新优惠券为非活跃状态失败:', error);
+    throw new Error('无法获取更新优惠券为非活跃');
+  }
+};
+
 // Function that formats and produce success logs
 const logSuccess = (statusCode, message) => {
   console.log(`[CouponSys - ${statusCode} OK] ${message}.`);
@@ -151,6 +172,7 @@ app.post('/validate-coupon', async (req, res) => {
     }
 
     if (new Date(coupon.Expiry) < new Date()) {
+      deactivateCoupon(coupon);
       console.log(`Got Coupon with Hash ${hash} is already expired.`);
       return res.json({ status: 'expired', message: '优惠券已过期' });
     }
@@ -192,12 +214,20 @@ app.post('/use-coupon', async (req, res) => {
   }
 
   try {
-    // Step 1: Find the coupon by hash
-    const coupons = await getAllCoupons(username);
-    const couponData = coupons.find((item) => item.Hash === hash);
+    // Send request to backend with Hash filter
+    const response = await axios.get(`${STRAPI_API}/coupons?filters[Hash][$eq]=${hash}&filters[AssignedFrom][$eq]=${username}`, {
+      headers: { Authorization: `Bearer ${STRAPI_KEY}` },
+    });
 
-    if (!couponData) {
+    const couponData = response.data?.data[0];
+
+    if (!couponData || couponData == null || couponData == undefined || couponData.Active == false) {
       return res.status(404).json({ message: '无效二维码' });
+    }
+
+    if (new Date(couponData.Expiry) < new Date()){
+      deactivateCoupon(couponData);
+      return res.status(406).json({ message: '此券已过期' });
     }
 
     const couponId = couponData.documentId;
@@ -205,7 +235,7 @@ app.post('/use-coupon', async (req, res) => {
 
     const updatedUsesLeft = coupon.UsesLeft - 1;
 
-    // Step 2: Update the coupon's UsesLeft and Active status
+    // Update the coupon's UsesLeft and Active status
     await axios.put(
       `${STRAPI_API}/coupons/${couponId}`,
       {
@@ -219,7 +249,7 @@ app.post('/use-coupon', async (req, res) => {
       }
     );
 
-    // Step 3: Find the user by username
+    // Find the user by username
     const userResponse = await axios.get(
       `${STRAPI_API}/coupon-sys-accounts?populate=ConsumptionRecord&filters[Name][$eq]=${username}`,
       {

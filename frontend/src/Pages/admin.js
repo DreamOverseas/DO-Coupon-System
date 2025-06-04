@@ -102,7 +102,7 @@ const CouponPage = () => {
       <header className="bg-white shadow p-4 flex items-center justify-between md:justify-start md:gap-4">
         <div className="flex items-center gap-4">
           <img src="/logo512.png" alt="Logo" className="w-12 h-12" />
-          <h1 className="text-xl font-bold">DO Coupon System ADMIN</h1>
+          <h1 className="text-xl font-bold">DO Coupon System Admin</h1>
         </div>
         <div className="flex-1 hidden md:flex justify-between items-center">
           <div className="flex gap-4">
