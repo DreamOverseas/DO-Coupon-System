@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import DoTermsAndConditions from '../Components/DoTermsAndConditions';
 
 const BACKEND_API = process.env.REACT_APP_BACKEND_API;
 
@@ -160,9 +161,13 @@ const Login = () => {
           />
         </div>
 
+        <div className='text-sm text-gray-700 mt-2 text-right'>
+          Please read our <DoTermsAndConditions defaultLang='en'/> carefully
+        </div>
+
         <button
           onClick={handleLogin}
-          className="w-full px-4 py-2 mt-6 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none"
+          className="w-full px-4 py-2 mt-1 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none"
         >
           Login / 登录
         </button>
