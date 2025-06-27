@@ -4,10 +4,10 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import DoTermsAndConditions from '../Components/DoTermsAndConditions';
 
-const BACKEND_API = process.env.REACT_APP_BACKEND_API;
+const BACKEND_API = import.meta.env.VITE_BACKEND_API;
 
-const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
-const API_KEY = process.env.REACT_APP_API_KEY;
+const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT;
+const API_KEY = import.meta.env.VITE_API_KEY;
 
 // Check if the Cookie still have valid records.
 const isAccountValid = async (name, role) => {

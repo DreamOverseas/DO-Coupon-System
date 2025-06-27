@@ -16,8 +16,8 @@ const CouponPage = () => {
 
   const navigate = useNavigate();
 
-  const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
-  const API_KEY = process.env.REACT_APP_API_KEY;
+  const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT;
+  const API_KEY = import.meta.env.VITE_API_KEY;
 
   useEffect(() => {
     // Fetch coupons from Strapi backend

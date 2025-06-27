@@ -4,9 +4,9 @@ import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-const BACKEND_API = process.env.REACT_APP_BACKEND_API;
-const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT;
-const API_KEY = process.env.REACT_APP_API_KEY;
+const BACKEND_API = import.meta.env.VITE_BACKEND_API;
+const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT;
+const API_KEY = import.meta.env.VITE_API_KEY;
 
 const MembershipField = Cookies.get('membershipField');
 
@@ -252,11 +252,11 @@ const MembershipManagement = () => {
         </div>
       </div>
       :
-      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
+      <div className="h-full bg-gray-100 flex flex-col items-center justify-center">
         <h1 className="text-2xl font-bold mb-4">Scan Membership QR Code</h1>
 
-        <div className="w-full max-w-sm bg-white p-4 shadow rounded">
-          <video ref={videoRef} className="w-full max-h-50" muted></video>
+        <div className="w-full max-w-md bg-white p-4 shadow rounded">
+          <video ref={videoRef} className="w-full aspect-square object-cover bg-black" muted></video>
         </div>
 
         <button

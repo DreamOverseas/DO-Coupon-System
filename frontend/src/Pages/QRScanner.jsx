@@ -14,7 +14,7 @@ const QRScanner = () => {
   const streamRef = useRef(null);
 
   const username = Cookies.get('username');
-  const BACKEND_API = process.env.REACT_APP_BACKEND_API;
+  const BACKEND_API = import.meta.env.VITE_BACKEND_API;
 
   useEffect(() => {
     const initScanner = async () => {
