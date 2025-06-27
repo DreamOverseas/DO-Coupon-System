@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { useTranslation } from 'react-i18next';
 
 const Overview = () => {
   const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT;
@@ -12,6 +13,8 @@ const Overview = () => {
   const [showActiveOnly, setShowActiveOnly] = useState(true); 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  
+  const { t } = useTranslation();
 
   const ITEMS_PER_PAGE = 9;
   const username = Cookies.get('username');

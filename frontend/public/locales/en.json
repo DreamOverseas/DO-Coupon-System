@@ -23,6 +23,16 @@
         "onlyactive": "Show Active Only",
         "search": "Search Coupon..."
     },
+    "scan": {
+        "camerr": "Failed to initialise camera, please check you device and permissions",
+        "videoerr": "Failed to start videoplay, please check you device settings",
+        "loseconn": "Lost connection to cloud, please check network connection",
+        "userr": "Error occured while trying to use coupon",
+        "rescan": "Scan Again",
+        "confirm": "Confirm Use",
+        "scanqr": "Scan Coupon QR code",
+        "switch_cam": "Switch Camera"
+    },
     "member": {
         "noactive": "Sorry, you have not yet activated this service.",
         "nocam": "Failed to initialise camera, please check you device and permissions.",
