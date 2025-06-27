@@ -15,10 +15,41 @@
         "membership_verify": "会员验证",
         "history": "使用历史"
     },
+    "member": {
+        "noactive": "请您先开通此功能，谢谢",
+        "nocam": "无法初始化摄像头, 请检查设备及权限。",
+        "scan": "扫描电子会员卡",
+        "switch_cam": "切换摄像头",
+        "detail": "会员详情",
+        "name": "会员",
+        "number": "会员号",
+        "email": "电子邮箱",
+        "exp": "到期日",
+        "point": "会员点 (余额+折扣点)",
+        "direct": "自由消费",
+        "confirm": "确认",
+        "total": "总价",
+        "deduction": "折扣值",
+        "def": "默认",
+        "notes": "商品 / 备注",
+        "balance": "余额",
+        "disc_p": "折扣点",
+        "final_conf": "请交由会员进行确认",
+        "conf_purchase": "确认兑换",
+        "processing": "处理中，请稍候...",
+        "complete": "兑换成功！信息已更新。",
+        "notfound": "未找到会员",
+        "qrerr": "无效二维码信息",
+        "nounique": "无法找到唯一会员",
+        "submiterr": "提交失败，请检查网络或数据格式",
+        "missing_field": "请完整填写所有字段",
+        "nochange": "请至少提供一项点数消耗",
+        "fatal_data": "非法数据",
+        "dataerr": "读取会员信息失败"
+    },
     "history": {
         "title": "卡券/会员消费 使用历史",
         "nope": "暂无使用记录",
         "search": "搜索记录"
-    },
-    "placeholder": "占位啦"
+    }
 }

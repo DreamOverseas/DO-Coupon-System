@@ -15,10 +15,41 @@
         "membership_verify": "Membership Verify",
         "history": "Coupon History"
     },
+    "member": {
+        "noactive": "Sorry, you have not yet activated this service.",
+        "nocam": "Failed to initialise camera, please check you device and permissions.",
+        "scan": "Scan Membership QR Code",
+        "switch_cam": "Switch Camera",
+        "detail": "Member Details",
+        "name": "Member Name",
+        "number": "Membership Number",
+        "email": "Member Email",
+        "exp": "Expiry Date",
+        "point": "DO Point (Balance+DiscountPoint)",
+        "direct": "Member Direct",
+        "confirm": "Confirm",
+        "total": "Total Amounts",
+        "deduction": "Deduction",
+        "def": "Default",
+        "notes": "Purpose / Notes",
+        "balance": "Balance",
+        "disc_p": "Discount Point",
+        "final_conf": "Please hand to member for final comfirmation",
+        "conf_purchase": "I confirm this purchase",
+        "processing": "Processing...",
+        "complete": "Redeem accomplished! You info's been updated.",
+        "notfound": "Member Not found",
+        "qrerr": "Invalid QR code data",
+        "nounique": "Cannot find a unique member",
+        "submiterr": "Failed to submit, please check network connection",
+        "missing_field": "Please fill-in nessesary fields",
+        "nochange": "Please enter deduction for at least one poinr field",
+        "fatal_data": "Data is Fatal, please ensure that the value you enter is correct",
+        "dataerr": "Error fetching Membership data"
+    },
     "history": {
         "title": "Coupon / Member-Direct History",
         "nope": "No consumption records available",
         "search": "Search Records"
-    },
-    "placeholder": "Placeholder"
+    }
 }

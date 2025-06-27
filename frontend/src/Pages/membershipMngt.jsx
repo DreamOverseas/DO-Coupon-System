@@ -3,6 +3,7 @@ import { BrowserMultiFormatReader } from '@zxing/browser';
 import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { useTranslation } from 'react-i18next';
 
 const BACKEND_API = import.meta.env.VITE_BACKEND_API;
 const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT;
@@ -30,6 +31,8 @@ const MembershipManagement = () => {
   const streamRef = useRef(null);
   const codeReaderRef = useRef(new BrowserMultiFormatReader());
 
+  const { t } = useTranslation();
+
   const isInvalidBalance = memberData && (
     memberData.DiscountPoint - deduction < 0 ||
     memberData.Point - totalAmount + deduction < 0);
@@ -47,7 +50,7 @@ const MembershipManagement = () => {
 
         const selectedDeviceId = videoInputDevices[currentDeviceIndex]?.deviceId;
         if (!selectedDeviceId) {
-          setErrorMsg('未检测到摄像头，请检查设备权限。');
+          setErrorMsg(t("member.nocam"));
           return;
         }
 
@@ -62,13 +65,13 @@ const MembershipManagement = () => {
         codeReaderRef.current.decodeOnceFromVideoDevice(selectedDeviceId, videoRef.current)
           .then(result => handleScan(result.getText().trim()))
           .catch(err => {
-            console.error('扫描失败:', err);
+            console.error(err);
             restartScanner();
           });
 
       } catch (err) {
-        console.error('摄像头初始化失败:', err);
-        setErrorMsg('摄像头初始化失败，请检查设备摄像头访问权限');
+        console.error(err);
+        setErrorMsg(t("member.nocam"));
       }
     };
 
@@ -103,11 +106,11 @@ const MembershipManagement = () => {
       const results = res.data.data;
 
       if (!results || results.length === 0) {
-        setErrorMsg('Member Not found | 未找到会员');
+        setErrorMsg(t("member.notfound"));
         setScanResult('');
         restartScanner();
       } else if (results.length > 1) {
-        setErrorMsg('Invalid QR data | 无效二维码信息');
+        setErrorMsg(t("member.qrerr"));
         setScanResult('');
         restartScanner();
       } else {
@@ -116,7 +119,7 @@ const MembershipManagement = () => {
       }
     } catch (err) {
       console.error(err);
-      setErrorMsg('Error fetching Membership data | 读取会员信息失败');
+      setErrorMsg(t("member.dataerr"));
       setScanResult('');
       restartScanner();
     }
@@ -135,10 +138,10 @@ const MembershipManagement = () => {
       codeReaderRef.current.decodeOnceFromVideoDevice(selectedDeviceId, videoRef.current)
         .then(result => handleScan(result.getText().trim()))
         .catch(err => {
-          console.error('重启扫描器失败:', err);
+          console.error('fail to restart scanner:', err);
         });
     } catch (err) {
-      console.error('重启失败:', err);
+      console.error('fail to restart scanner:', err);
     }
   };
 
@@ -176,7 +179,7 @@ const MembershipManagement = () => {
       });
 
       const match = res.data?.data;
-      if (!match || match.length !== 1) throw new Error('未找到唯一会员');
+      if (!match || match.length !== 1) throw new Error(t("member.nounique"));
 
       const memberID = match[0].documentId;
       const currentPoints = match[0].Point;
@@ -210,7 +213,7 @@ const MembershipManagement = () => {
       setSuccessMsg(true);
     } catch (err) {
       console.error(err);
-      alert('提交失败，请检查网络或数据格式');
+      alert(t("member.submiterr"));
     } finally {
       setIsLoading(false);
     }
@@ -227,16 +230,16 @@ const MembershipManagement = () => {
   };
 
   const handleConfirmDetail = () => {
-    if (!totalAmount || !deduction || !purpose.trim()) {
-      alert('请完整填写所有字段');
+    if (!(totalAmount || deduction) || !purpose.trim()) {
+      alert(t("member.missing_field"));
       return;
     }
     if (deduction === 0 && totalAmount === 0) {
-      alert('请至少更改任一数值！');
+      alert(t("member.nochange"));
       return;
     }
     if (deduction < 0 || totalAmount < 0) {
-      alert('非法数据！');
+      alert(t("member.fatal_data"));
       return;
     }
     setShowConfirmModal(true);
@@ -248,15 +251,26 @@ const MembershipManagement = () => {
       <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-700">
         <div className="text-center">
           <i className="bi bi-person-lock text-5xl text-gray-600 mb-4"></i>
-          <p className="text-lg font-medium">Sorry, you have not yet activated this service.</p>
+          <p className="text-lg font-medium">{t("member.noactive")}</p>
         </div>
       </div>
       :
       <div className="h-full bg-gray-100 flex flex-col items-center justify-center">
-        <h1 className="text-2xl font-bold mb-4">Scan Membership QR Code</h1>
+        <h1 className="text-2xl font-bold mb-4">{t("member.scan")}</h1>
 
-        <div className="w-full max-w-md bg-white p-4 shadow rounded">
+        <div className="w-full max-w-md bg-white p-4 shadow rounded relative">
           <video ref={videoRef} className="w-full aspect-square object-cover bg-black" muted></video>
+          <svg
+            className="absolute scale-75 inset-0 w-full h-full text-blue-300/50 pointer-events-none"
+            viewBox="0 0 200 200"
+            fill="none"
+            stroke="currentColor"
+          >
+            <path d="M20 50 V20 H50" strokeWidth="3" />
+            <path d="M150 20 H180 V50" strokeWidth="3" />
+            <path d="M180 150 V180 H150" strokeWidth="3" />
+            <path d="M50 180 H20 V150" strokeWidth="3" />
+          </svg>
         </div>
 
         <button
@@ -264,7 +278,7 @@ const MembershipManagement = () => {
           className={`mt-4 ${videoDevices.length > 1 ? 'bg-blue-500 hover:bg-blue-700' : 'bg-gray-400'} text-white font-bold py-2 px-4 rounded`}
           disabled={videoDevices.length <= 1}
         >
-          Switch Camera | 切换摄像头
+          {t("member.switch_cam")}
         </button>
 
         {errorMsg && (
@@ -280,22 +294,22 @@ const MembershipManagement = () => {
         {memberData && (
           <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 max-w-md max-h-[90vh] w-full overflow-auto animate-zoom-in z-50">
             <div className="flex justify-between items-center border-b pb-2 mb-4">
-              <h2 className="text-xl font-bold text-center w-full">Member Details</h2>
-              <button onClick={closeDetails} className="text-gray-500 text-xl absolute top-4 right-4">×</button>
+              <h2 className="text-xl font-bold text-center w-full">{t("member.detail")}</h2>
+              <button onClick={closeDetails} className="text-gray-500 text-xl absolute top-4 right-4"><i class="bi bi-x-lg"></i></button>
             </div>
 
-            <p><strong>Member 会员:</strong> {memberData.UserName ? memberData.UserName : memberData.Name}</p>
-            <p><strong>Membership Number 会员号:</strong> {memberData.MembershipNumber}</p>
-            <p><strong>Email 电子邮箱:</strong> {memberData.Email}</p>
-            <p><strong>Expiry Date 到期日:</strong> {memberData.ExpiryDate}</p>
-            <p><strong>DO Point 会员点 (余额+折扣点):</strong> {memberData.Point} + {memberData.DiscountPoint}</p>
+            <p><strong>{t("member.name")}:</strong> {memberData.UserName ? memberData.UserName : memberData.Name}</p>
+            <p><strong>{t("member.number")}:</strong> {memberData.MembershipNumber}</p>
+            <p><strong>{t("member.email")}:</strong> {memberData.Email}</p>
+            <p><strong>{t("member.exp")}:</strong> {memberData.ExpiryDate}</p>
+            <p><strong>{t("member.point")}:</strong> {memberData.Point} + {memberData.DiscountPoint}</p>
 
             <div className="mt-6 flex flex-col gap-4">
               <button
                 onClick={() => setShowFreeUseModal(true)}
                 className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded flex items-center justify-center"
               >
-                <i className="bi bi-currency-dollar mr-2"></i> Member-Direct 自由消费
+                <i className="bi bi-currency-dollar mr-2"></i> {t("member.direct")}
               </button>
 
               {/* <button
@@ -309,7 +323,7 @@ const MembershipManagement = () => {
                 onClick={closeDetails}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded flex items-center justify-center"
               >
-                <i className="bi bi-check-circle mr-2"></i> Comfirm 确认
+                <i className="bi bi-check-circle mr-2"></i> {t("member.confirm")}
               </button>
             </div>
           </div>
@@ -317,26 +331,26 @@ const MembershipManagement = () => {
 
         {/* Modal FOr Membership Direct */}
         {showFreeUseModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
             <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative animate-zoom-in">
               <button
                 onClick={() => setShowFreeUseModal(false)}
                 className="absolute top-4 right-4 text-gray-500 text-xl"
-              >×</button>
-              <h2 className="text-xl font-bold mb-4">Membership Direct | 自由消费</h2>
+              ><i class="bi bi-x-lg"></i></button>
+              <h2 className="text-xl font-bold mb-4">{t("member.direct")}</h2>
 
               <div className="mb-3 text-left">
-                <label className="block text-sm font-medium">Membership Number | 会员号</label>
+                <label className="block text-sm font-medium">{t("member.number")}</label>
                 <input type="text" value={memberData.MembershipNumber} disabled className="w-full bg-gray-100 border rounded px-3 py-2 mt-1" />
               </div>
 
               <div className="mb-3 text-left">
-                <label className="block text-sm font-medium">Member Email | 电子邮箱</label>
+                <label className="block text-sm font-medium">{t("member.email")}</label>
                 <input type="text" value={memberData.Email} disabled className="w-full bg-gray-100 border rounded px-3 py-2 mt-1" />
               </div>
 
               <div className="mb-3 text-left">
-                <label className="block text-sm font-medium">Total Amounts | 总价</label>
+                <label className="block text-sm font-medium">{t("member.total")}</label>
                 <input
                   type="number"
                   value={totalAmount}
@@ -348,7 +362,7 @@ const MembershipManagement = () => {
               </div>
 
               <div className="mb-3 text-left">
-                <label className="block text-sm font-medium">Deduction | 折扣值</label>
+                <label className="block text-sm font-medium">{t("member.deduction")}</label>
                 <div className="flex gap-2 items-center">
                   <input
                     type="number"
@@ -358,12 +372,14 @@ const MembershipManagement = () => {
                     min={0}
                     className="w-full border rounded px-3 py-2 mt-1"
                   />
-                  <button className="bg-black text-white min-w-14 min-h-10 text-sm px-3 py-1 rounded mt-1" onClick={handleDefaultDeduction}>默认</button>
+                  <button className="bg-black text-white min-w-16 min-h-10 text-sm px-2 py-1 rounded mt-1" onClick={handleDefaultDeduction}>
+                    {t("member.def")}
+                  </button>
                 </div>
               </div>
 
               <div className="mb-3 text-left">
-                <label className="block text-sm font-medium">Purpose / Notes | 商品 / 备注</label>
+                <label className="block text-sm font-medium">{t("member.notes")}</label>
                 <textarea
                   value={purpose}
                   onChange={(e) => setPurpose(e.target.value)}
@@ -374,10 +390,10 @@ const MembershipManagement = () => {
               </div>
 
               <div className="text-sm text-gray-700 mb-3">
-                Balance | 余额: {memberData.Point} <i className="bi bi-arrow-right mx-2"></i> {memberData.Point - totalAmount + deduction}
+                {t("member.balance")}: {memberData.Point} <i className="bi bi-arrow-right mx-2"></i> {memberData.Point - totalAmount + deduction}
               </div>
               <div className="text-sm text-gray-700 mb-3">
-                Discount Point | 折扣点: {memberData.DiscountPoint} <i className="bi bi-arrow-right mx-2"></i> {memberData.DiscountPoint - deduction}
+                {t("member.disc_p")}: {memberData.DiscountPoint} <i className="bi bi-arrow-right mx-2"></i> {memberData.DiscountPoint - deduction}
               </div>
 
               <button
@@ -389,7 +405,7 @@ const MembershipManagement = () => {
                     : 'bg-blue-600 hover:bg-blue-700 text-white'}
   `}
               >
-                <i className="bi bi-send-check mr-2"></i> Confirm | 确认
+                <i className="bi bi-send-check mr-2"></i> {t("member.confirm")}
               </button>
             </div>
           </div>
@@ -397,29 +413,28 @@ const MembershipManagement = () => {
 
         {/* Comfirmation for Member */}
         {showConfirmModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
             <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative animate-fade-in">
               <button
                 onClick={() => setShowConfirmModal(false)}
                 className="absolute top-4 right-4 text-gray-500 text-xl"
-              >×</button>
+              ><i class="bi bi-x-lg"></i></button>
               <h2 className="text-lg font-bold mb-4 text-center">
-                Final comfirmation by MEMBER <br/>
-                请交由会员进行确认
+                {t("member.final_conf")}
               </h2>
               <div className="text-sm text-gray-700 space-y-1 mb-4 text-left">
-                <p><strong>Member | 会员:</strong> {memberData.UserName ? memberData.UserName : memberData.Name}</p>
-                <p><strong>Membership Number | 会员号:</strong> {memberData.MembershipNumber}</p>
-                <p><strong>Email | 电子邮箱:</strong> {memberData.Email}</p>
-                <p><strong>DO Point | 会员点:</strong> {memberData.Point + memberData.DiscountPoint} → {memberData.Point + memberData.DiscountPoint - totalAmount}</p>
-                <p><strong> &gt; Balance | 余额:</strong> {memberData.Point} → {memberData.Point - totalAmount + deduction}</p>
-                <p><strong> &gt; Dicount Point | 折扣点:</strong> {memberData.DiscountPoint} → {memberData.DiscountPoint - deduction}</p>
+                <p><strong>{t("member.name")}:</strong> {memberData.UserName ? memberData.UserName : memberData.Name}</p>
+                <p><strong>{t("member.number")}:</strong> {memberData.MembershipNumber}</p>
+                <p><strong>{t("member.email")}:</strong> {memberData.Email}</p>
+                <p><strong>{t("member.point")}:</strong> {memberData.Point + memberData.DiscountPoint} → {memberData.Point + memberData.DiscountPoint - totalAmount}</p>
+                <p><strong> &gt; {t("member.balance")}:</strong> {memberData.Point} → {memberData.Point - totalAmount + deduction}</p>
+                <p><strong> &gt; {t("member.disc_p")}:</strong> {memberData.DiscountPoint} → {memberData.DiscountPoint - deduction}</p>
               </div>
               <button
                 onClick={handleFinalSubmit}
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center"
               >
-                <i className="bi bi-check2-circle mr-2"></i> I confirm this purchase | 确认兑换
+                <i className="bi bi-check2-circle mr-2"></i> {t("member.conf_purchase")}
               </button>
             </div>
           </div>
@@ -427,22 +442,20 @@ const MembershipManagement = () => {
 
         {/* Loading  */}
         {isLoading && (
-          <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
             <div className="text-center">
               <div className="spinner-border animate-spin inline-block w-12 h-12 border-4 border-white rounded-full" role="status"></div>
-              <p className="text-white mt-4">Processing...</p>
-              <p className="text-white mt-4">处理中，请稍候...</p>
+              <p className="text-white mt-4">{t("member.processing")}</p>
             </div>
           </div>
         )}
 
         {/* Success */}
         {successMsg && (
-          <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50" onClick={resetAll}>
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={resetAll}>
             <div className="bg-white rounded-lg shadow-lg px-6 py-4 flex flex-col items-center animate-zoom-in">
               <i className="bi bi-check-circle-fill text-green-500 text-4xl mb-2"></i>
-              <p className="text-green-700 font-semibold">Redeem accomplished! You info's been updated.</p>
-              <p className="text-green-700 font-semibold">兑换成功！信息已更新。</p>
+              <p className="text-green-700 font-semibold">{t("member.complete")}</p>
             </div>
           </div>
         )}

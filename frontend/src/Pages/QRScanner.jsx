@@ -175,7 +175,7 @@ const QRScanner = () => {
             muted
           />
           <svg
-            className="absolute inset-0 w-full h-full text-amber-200 opacity-50 pointer-events-none"
+            className="absolute inset-0 w-full h-full text-amber-200/50 pointer-events-none"
             viewBox="0 0 200 200"
             fill="none"
             stroke="currentColor"
