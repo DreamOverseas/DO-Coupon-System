@@ -15,5 +15,10 @@
         "membership_verify": "会员验证",
         "history": "使用历史"
     },
+    "history": {
+        "title": "卡券/会员消费 使用历史",
+        "nope": "暂无使用记录",
+        "search": "搜索记录"
+    },
     "placeholder": "占位啦"
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { useTranslation } from 'react-i18next';
 
 const History = () => {
   const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT;
@@ -11,6 +12,7 @@ const History = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const username = Cookies.get('username');
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -53,12 +55,12 @@ const History = () => {
 
   return (
     <div className="p-4 h-full flex flex-col">
-      <h1 className="text-2xl font-bold mb-4">卡券使用历史 / Coupon History</h1>
+      <h1 className="text-2xl font-bold mb-4">{t("history.title")}</h1>
 
       {/* Search Inputtin' field */}
       <input
         type="text"
-        placeholder="Search/搜索记录..."
+        placeholder={`${t("history.search")}...`}
         className="border px-4 py-2 rounded mb-4 w-full max-w-md"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
@@ -68,8 +70,7 @@ const History = () => {
       <div className="flex-1 overflow-y-auto bg-gray-50 p-4 rounded shadow-inner">
         {filteredRecords.length === 0 ? (
           <div className="text-center mt-10">
-            <p className="text-xl font-bold">暂无使用记录</p>
-            <p className="text-gray-500">No consumption records available</p>
+            <p className="text-xl font-bold text-gray-500">{t("history.nope")}</p>
           </div>
         ) : (
           <ul className="space-y-4">

@@ -15,5 +15,10 @@
         "membership_verify": "Membership Verify",
         "history": "Coupon History"
     },
+    "history": {
+        "title": "Coupon / Member-Direct History",
+        "nope": "No consumption records available",
+        "search": "Search Records"
+    },
     "placeholder": "Placeholder"
 }
