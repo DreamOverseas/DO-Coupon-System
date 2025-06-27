@@ -15,6 +15,14 @@
         "membership_verify": "Membership Verify",
         "history": "Coupon History"
     },
+    "overview": {
+        "nothing": "Cannot find any Coupon data",
+        "assignto": "Assigned to",
+        "useleft": "Uses Left",
+        "exp": "Expiry",
+        "onlyactive": "Show Active Only",
+        "search": "Search Coupon..."
+    },
     "member": {
         "noactive": "Sorry, you have not yet activated this service.",
         "nocam": "Failed to initialise camera, please check you device and permissions.",
@@ -50,6 +58,6 @@
     "history": {
         "title": "Coupon / Member-Direct History",
         "nope": "No consumption records available",
-        "search": "Search Records"
+        "search": "Search Records..."
     }
 }

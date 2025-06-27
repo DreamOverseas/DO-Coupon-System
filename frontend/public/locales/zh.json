@@ -15,6 +15,14 @@
         "membership_verify": "会员验证",
         "history": "使用历史"
     },
+    "overview": {
+        "nothing": "暂无卡券数据",
+        "assignto": "签发给",
+        "useleft": "剩余次数",
+        "exp": "到期日",
+        "onlyactive": "仅显示可用卡券",
+        "search": "搜索卡券..."
+    },
     "member": {
         "noactive": "请您先开通此功能，谢谢",
         "nocam": "无法初始化摄像头, 请检查设备及权限。",
@@ -50,6 +58,6 @@
     "history": {
         "title": "卡券/会员消费 使用历史",
         "nope": "暂无使用记录",
-        "search": "搜索记录"
+        "search": "搜索记录..."
     }
 }

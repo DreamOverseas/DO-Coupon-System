@@ -77,7 +77,7 @@ const Overview = () => {
       <div className="flex justify-between items-center mb-4">
         <input
           type="text"
-          placeholder="Search/搜索卡券..."
+          placeholder={t("overview.search")}
           className="border px-4 py-2 rounded w-full max-w-md"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -89,15 +89,14 @@ const Overview = () => {
             checked={showActiveOnly}
             onChange={() => setShowActiveOnly(!showActiveOnly)}
           />
-          Show Active Only
+          {t("overview.onlyactive")}
         </label>
       </div>
 
       {/* displays all coupons */}
       {filteredCoupons.length === 0 ? (
         <div className="text-center mt-10">
-          <p className="text-xl font-bold">暂无卡券数据</p>
-          <p className="text-gray-500">Currently you don't have any Coupon</p>
+          <p className="text-xl font-bold text-gray-500">{t("overview.nothing")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -110,7 +109,7 @@ const Overview = () => {
               <p className="text-sm text-gray-500 max-h-[75px] overflow-y-auto">{coupon.Description}</p>
               <hr className="my-2" />
               <div className="flex justify-between items-center">
-                <p className="text-sm text-gray-700">Assigned to: {coupon.AssignedTo}</p>
+                <p className="text-sm text-gray-700">{t("overview.assignto")}: {coupon.AssignedTo}</p>
                 <span
                   className={`px-2 py-1 rounded ${
                     coupon.Active ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
@@ -121,8 +120,8 @@ const Overview = () => {
               </div>
               <hr className="my-2" />
               <div className="flex justify-between items-center">
-                <p className="text-sm text-gray-700">Uses Left: {coupon.UsesLeft}</p>
-                <p className="text-sm text-gray-700">Expiry: {coupon.Expiry}</p>
+                <p className="text-sm text-gray-700">{t("overview.useleft")}: {coupon.UsesLeft}</p>
+                <p className="text-sm text-gray-700">{t("overview.exp")}: {coupon.Expiry}</p>
               </div>
             </div>
           ))}
