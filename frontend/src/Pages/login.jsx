@@ -159,9 +159,9 @@ const Login = () => {
       <div className="w-full max-w-md p-8 bg-white rounded shadow-md relative">
         <button 
           className='absolute rounded p-1 bg-amber-500/50 top-2 right-2 z-50'
-          type='button' >
+          type='button' onClick={toggleLang} >
             <div className='min-w-12'>
-            {getLangText(i18n.language)}<i class="bi bi-arrow-clockwise" onClick={toggleLang}></i>
+            {getLangText(i18n.language)}<i class="bi bi-arrow-clockwise" ></i>
             </div>
         </button>
         <div className='min-h-16 flex justify-center align-middle mt-2'>

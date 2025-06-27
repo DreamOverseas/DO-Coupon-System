@@ -5,12 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import Overview from './overview';
 import History from './history';
 import MembershipManagement from './membershipMngt';
+import { useTranslation } from 'react-i18next';
 
 const Dashboard = () => {
     const [activeTab, setActiveTab] = useState('overview');
     const [username, setUsername] = useState('');
     const navigate = useNavigate();
     const MembershipField = Cookies.get('membershipField');
+
+    const { t, i18n } = useTranslation();
 
     useEffect(() => {
         // Ensure only Provider role can view this page
@@ -41,6 +44,26 @@ const Dashboard = () => {
         }
     };
 
+    const toggleLang = () => {
+        if (i18n.language == 'zh') {
+        i18n.changeLanguage('en');
+        return;
+        }
+        if (i18n.language == 'en') {
+        i18n.changeLanguage('zh');
+        return;
+        }
+    }
+
+    function getLangText() {
+        if (i18n.language == 'en') {
+        return "中文";
+        }
+        if (i18n.language == 'zh') {
+        return "English";
+        }
+    }
+
     const handleLogout = () => {
         // Del All Cookies
         Cookies.remove('username');
@@ -54,15 +77,24 @@ const Dashboard = () => {
             <header className="bg-gray-800 text-white py-4 px-6 flex items-center justify-between shadow-md">
                 <div className="flex items-center space-x-4">
                     <img src="/logo-wh.png" alt="Logo" className="h-10 w-10" />
-                    <span className="hidden sm:block text-lg font-bold">DO Coupon Client</span>
+                    <span className="hidden sm:block text-lg font-bold">{t("dashboard.title")}</span>
                 </div>
-                <div className="text-sm font-medium">Welcome, {username}. </div>
-                <button
-                    onClick={handleLogout}
-                    className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded"
-                >
-                    登出 / Logout
-                </button>
+                <div className="text-sm font-medium">{t("dashboard.greet")} {username}. </div>
+                <div>
+                    <button 
+                        className='bg-amber-500 hover:bg-amber-700 text-white text-sm font-bold py-2 px-4 mr-2 rounded' 
+                        onClick={toggleLang}>
+                        <div className='min-w-12'>
+                        {getLangText(i18n.language)} <i class="bi bi-arrow-clockwise"></i>
+                        </div>
+                    </button>
+                    <button
+                        onClick={handleLogout}
+                        className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded"
+                    >
+                        {t("dashboard.logout")}
+                    </button>
+                </div>
             </header>
 
             {/* Main contents */}
@@ -76,7 +108,7 @@ const Dashboard = () => {
                     onClick={() => setActiveTab('overview')}
                 >
                     <i className={`bi bi-view-list text-2xl transition-opacity ${activeTab === 'overview' ? 'text-lime-400' : 'text-white'}`}></i>
-                    <p className={`mt-1 hidden sm:block ${activeTab === 'overview' ? 'font-bold' : 'font-normal'}`}>卡券一览 / Coupon Overview</p>
+                    <p className={`mt-1 block ${activeTab === 'overview' ? 'font-bold' : 'font-normal'}`}>{t("dashboard.overview")}</p>
                 </button>
 
                 <button
@@ -84,7 +116,7 @@ const Dashboard = () => {
                     onClick={() => setActiveTab('scanner')}
                 >
                     <i className={`bi bi-qr-code-scan text-2xl transition-opacity ${activeTab === 'scanner' ? 'text-blue-400' : 'text-white'}`}></i>
-                    <p className={`mt-1 hidden sm:block ${activeTab === 'scanner' ? 'font-bold' : 'font-normal'}`}>扫描卡券 / Scan Coupon</p>
+                    <p className={`mt-1 block ${activeTab === 'scanner' ? 'font-bold' : 'font-normal'}`}>{t("dashboard.coupon_scan")}</p>
                 </button>
 
                 {MembershipField && MembershipField !== 'null' && MembershipField !== 'undefined' && MembershipField.trim() !== '' && (
@@ -93,7 +125,7 @@ const Dashboard = () => {
                         onClick={() => setActiveTab('membership')}
                     >
                         <i className={`bi bi-person-bounding-box text-2xl transition-opacity ${activeTab === 'membership' ? 'text-violet-400' : 'text-white'}`}></i>
-                        <p className={`mt-1 hidden sm:block ${activeTab === 'membership' ? 'font-bold' : 'font-normal'}`}>会员验证 / Membership Verify</p>
+                        <p className={`mt-1 block ${activeTab === 'membership' ? 'font-bold' : 'font-normal'}`}>{t("dashboard.membership_verify")}</p>
                     </button>
                 )}
 
@@ -102,7 +134,7 @@ const Dashboard = () => {
                     onClick={() => setActiveTab('history')}
                 >
                     <i className={`bi bi-clock-history text-2xl transition-opacity ${activeTab === 'history' ? 'text-amber-300' : 'text-white'}`}></i>
-                    <p className={`mt-1 hidden sm:block ${activeTab === 'history' ? 'font-bold' : 'font-normal'}`}>使用历史 / Coupon History</p>
+                    <p className={`mt-1 block ${activeTab === 'history' ? 'font-bold' : 'font-normal'}`}>{t("dashboard.history")}</p>
                 </button>
             </footer>
 
