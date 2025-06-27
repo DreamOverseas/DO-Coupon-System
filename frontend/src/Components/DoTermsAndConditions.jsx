@@ -10,7 +10,7 @@
 
 import React, { useState } from 'react';
 
-const DoTermsAndConditions = ({ defaultLang = 'zh' }) => {
+const DoTermsAndConditions = ({ defaultLang }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [lang, setLang] = useState(defaultLang);
 

@@ -4,6 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import Login from './Pages/login';
 import CouponPage from './Pages/admin';
 import Dashboard from './Pages/dashboard';
+import './i18n';
 
 function App() {
   return (

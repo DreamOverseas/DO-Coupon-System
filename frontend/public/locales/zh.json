@@ -1,0 +1,10 @@
+{
+    "login": {
+        "title": "DO集团会员及核销券管理系统",
+        "username": "用户名",
+        "pwd": "密码",
+        "loginbtn": "登录",
+        "readtc": "请仔细阅读我们的"
+    },
+    "placeholder": "Placeholder"
+}

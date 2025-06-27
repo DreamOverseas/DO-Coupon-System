@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import DoTermsAndConditions from '../Components/DoTermsAndConditions';
+import { useTranslation } from 'react-i18next';
 
 const BACKEND_API = import.meta.env.VITE_BACKEND_API;
 
@@ -70,6 +71,8 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  const { t, i18n } = useTranslation();
+
   useEffect(() => {
     // Check for existing cookie and redirect if logged in
     const role = Cookies.get('role');
@@ -92,6 +95,26 @@ const Login = () => {
       handleLogin();
     }
   };
+
+  const toggleLang = () => {
+    if (i18n.language == 'zh') {
+      i18n.changeLanguage('en');
+      return;
+    }
+    if (i18n.language == 'en') {
+      i18n.changeLanguage('zh');
+      return;
+    }
+  }
+
+  function getLangText() {
+    if (i18n.language == 'en') {
+      return "中文";
+    }
+    if (i18n.language == 'zh') {
+      return "English";
+    }
+  }
 
   const handleLogin = async () => {
     if (!name || !password) {
@@ -133,16 +156,25 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-100"
       onKeyDown={handleKeyDown}
     >
-      <div className="w-full max-w-md p-8 bg-white rounded shadow-md">
-        <h1 className="text-2xl font-bold text-center">DO Membership & Coupon Management System</h1>
-        <h2 className="text-lg font-medium text-center text-gray-600 mt-2">DO集团会员及核销券管理系统</h2>
+      <div className="w-full max-w-md p-8 bg-white rounded shadow-md relative">
+        <button 
+          className='absolute rounded p-1 bg-amber-500/50 top-2 right-2 z-50'
+          type='button' >
+            <div className='min-w-12'>
+            {getLangText(i18n.language)}<i class="bi bi-arrow-clockwise" onClick={toggleLang}></i>
+            </div>
+        </button>
+        <div className='min-h-16 flex justify-center align-middle mt-2'>
+          <h1 className="text-2xl font-bold text-center">{t("login.title")}</h1>
+        </div>
+        <h4 className="text-lg font-medium text-center text-gray-500 mt-2">===================</h4>
 
         {errorMessage && (
           <div className="mt-4 text-red-500 text-center">{errorMessage}</div>
         )}
 
         <div className="mt-6">
-          <label className="block text-left text-gray-700">UserName / 用户名</label>
+          <label className="block text-left text-gray-700">{t("login.username")}</label>
           <input
             type="text"
             value={name}
@@ -152,7 +184,7 @@ const Login = () => {
         </div>
 
         <div className="mt-4">
-          <label className="block text-left text-gray-700">Password / 密码</label>
+          <label className="block text-left text-gray-700">{t("login.pwd")}</label>
           <input
             type="password"
             value={password}
@@ -162,14 +194,14 @@ const Login = () => {
         </div>
 
         <div className='text-sm text-gray-700 mt-2 text-right'>
-          Please read our <DoTermsAndConditions defaultLang='en'/> carefully
+          {t("login.readtc")} <DoTermsAndConditions defaultLang={i18n.language}/>
         </div>
 
         <button
           onClick={handleLogin}
           className="w-full px-4 py-2 mt-1 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none"
         >
-          Login / 登录
+          {t("login.loginbtn")}
         </button>
       </div>
     </div>

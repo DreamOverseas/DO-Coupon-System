@@ -1,0 +1,10 @@
+{
+    "login": {
+        "title": "DO Membership & Coupon Management System",
+        "username": "User Name",
+        "pwd": "Password",
+        "loginbtn": "Login",
+        "readtc": "Please read carefully our"
+    },
+    "placeholder": "Placeholder"
+}
