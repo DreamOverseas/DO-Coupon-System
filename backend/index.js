@@ -307,6 +307,7 @@ app.post('/use-coupon', async (req, res) => {
  * @params title -> the title for coupon
  * @params description -> short description for the coupon
  * @params expiry -> the exp date in yyyy-MM-dd
+ * @params uses_left -> how many times this coupon can scan
  * @params assigned_from -> who provides good/service with this coupon
  * @params assigned_to -> who owns this coupon
  * @returns couponStatus -> the status of created coupon; 'active' if successful
@@ -314,7 +315,7 @@ app.post('/use-coupon', async (req, res) => {
  * @returns message -> natrual language describing situation for debugging and more
  */
 app.post('/create-active-coupon', async (req, res) => {
-  const { title, description, expiry, assigned_from, assigned_to, email, contact } = req.body;
+  const { title, description, expiry, uses_left, assigned_from, assigned_to, email, contact } = req.body;
 
   if (!title || !expiry || !assigned_from || !assigned_to){
     return res.status(400).json({ couponStatus: 'fail', message: 'Title, Expiry Date, assigning info are nessesary.' });
@@ -328,6 +329,7 @@ app.post('/create-active-coupon', async (req, res) => {
       AssignedFrom: assigned_from,
       AssignedTo: assigned_to,
       Active: true,
+      UsesLeft: uses_left || 1,
       Hash: crypto.randomBytes(16).toString('hex'),
       Email: email,
       Contact: contact
