@@ -13,6 +13,7 @@ const allowedOrigins = [
   'http://localhost:5173', // TODO: Del
   'https://coupon.do360.com',
   'https://1club.world',
+  'https://do360.com',
   'https://www.1club.world',  // www.
   'https://roseneathholidaypark.au',
   'https://world-cooperation.org',
@@ -313,7 +314,7 @@ app.post('/use-coupon', async (req, res) => {
  * @returns message -> natrual language describing situation for debugging and more
  */
 app.post('/create-active-coupon', async (req, res) => {
-  const {title, description, expiry, assigned_from, assigned_to, email, contact } = req.body;
+  const { title, description, expiry, assigned_from, assigned_to, email, contact } = req.body;
 
   if (!title || !expiry || !assigned_from || !assigned_to){
     return res.status(400).json({ couponStatus: 'fail', message: 'Title, Expiry Date, assigning info are nessesary.' });
