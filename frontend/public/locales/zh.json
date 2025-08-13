@@ -30,6 +30,7 @@
         "userr": "确认使用时发生错误，请重试",
         "rescan": "重新扫描",
         "confirm": "确认使用",
+        "usesleft": "剩余使用次数:",
         "scanqr": "扫描卡券二维码",
         "switch_cam": "切换摄像头"
     },

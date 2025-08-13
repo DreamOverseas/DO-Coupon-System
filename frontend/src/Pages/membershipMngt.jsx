@@ -278,7 +278,7 @@ const MembershipManagement = () => {
           className={`mt-4 ${videoDevices.length > 1 ? 'bg-blue-500 hover:bg-blue-700' : 'bg-gray-400'} text-white font-bold py-2 px-4 rounded`}
           disabled={videoDevices.length <= 1}
         >
-          {t("member.switch_cam")}
+          <i className="bi bi-arrow-clockwise"></i> {t("member.switch_cam")}
         </button>
 
         {errorMsg && (

@@ -30,6 +30,7 @@
         "userr": "Error occured while trying to use coupon",
         "rescan": "Scan Again",
         "confirm": "Confirm Use",
+        "usesleft": "Uses Left:",
         "scanqr": "Scan Coupon QR code",
         "switch_cam": "Switch Camera"
     },

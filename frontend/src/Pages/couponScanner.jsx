@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useTranslation } from 'react-i18next';
+import DOMPurify from 'dompurify';
 
 const CouponScanner = () => {
   const [scanResult, setScanResult] = useState('');
@@ -91,6 +92,21 @@ const CouponScanner = () => {
       setSuccessResult(couponStatus);
     }
   }, [couponStatus]);
+
+  // manually filter XSS to set dangerous to safeeeeeeeeeeeeeeeeeeeeeeeee
+  const sanitizeHTML = (html) => {
+    const raw = html || '';
+    const clean = DOMPurify.sanitize(raw, {
+      ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'u', 'p', 'br', 'ul', 'ol', 'li', 'a', 'span'],
+      ALLOWED_ATTR: ['href', 'title', 'target', 'rel'],
+    });
+    return { __html: clean };
+  };
+  // Memo for performance
+  const safeCouponDesc = useMemo(
+    () => sanitizeHTML(couponStatus?.description),
+    [couponStatus?.description]
+  );
 
   const handleScan = async (data) => {
     if (!data) return;
@@ -187,7 +203,7 @@ const CouponScanner = () => {
           } text-white font-bold py-2 px-4 rounded`}
         disabled={videoDevices.length <= 1}
       >
-        {t("scan.switch_cam")}
+        <i className="bi bi-arrow-clockwise"></i> {t("scan.switch_cam")}
       </button>
 
       {/* Success coupon display Modal */}
@@ -199,22 +215,25 @@ const CouponScanner = () => {
               className="absolute top-4 right-4 text-gray-500 text-xl"
             ><i className="bi bi-x-lg"></i></button>
             <p className="text-green-500 mt-2 text-lg">{couponStatus.title}</p>
-            <p className="text-gray-500 mt-1 text-sm max-h-[150px] overflow-y-auto">
-              {couponStatus.description}
+            <p className="text-gray-700 bg-amber-100/50 mt-1 text-sm max-h-[50vh] overflow-y-auto" 
+                dangerouslySetInnerHTML={ safeCouponDesc }>
+            </p>
+            <p className="text-gray-500 mt-2 text-xs max-h-[150px] overflow-y-auto">
+              {t("scan.usesleft")} {couponStatus.uses_left}
             </p>
             <div className="mt-4 flex justify-center gap-4">
               <button
                 onClick={() => {setSuccessResult(null); setScanResult('');}}
                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
               >
-                {t("scan.rescan")}
+                <i className="bi bi-arrow-left-short"></i> {t("scan.rescan")}
               </button>
 
               <button
                 onClick={handleConfirmUse}
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
               >
-                {t("scan.confirm")}
+                {t("scan.confirm")} <i className="bi bi-check2-circle"></i> 
               </button>
             </div>
           </div>
