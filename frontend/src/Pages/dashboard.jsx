@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
-import QRScanner from './QRScanner';
 import { useNavigate } from 'react-router-dom';
 import Overview from './overview';
 import History from './history';
+import CouponScanner from './couponScanner';
 import MembershipManagement from './membershipMngt';
 import { useTranslation } from 'react-i18next';
 
@@ -34,7 +34,7 @@ const Dashboard = () => {
             case 'overview':
                 return <Overview />;
             case 'scanner':
-                return <QRScanner />;
+                return <CouponScanner />;
             case 'history':
                 return <History />;
             case 'membership':
@@ -85,7 +85,7 @@ const Dashboard = () => {
                         className='bg-amber-500 hover:bg-amber-700 text-white text-sm font-bold py-2 px-4 mr-2 rounded' 
                         onClick={toggleLang}>
                         <div className='min-w-12'>
-                        {getLangText(i18n.language)} <i class="bi bi-arrow-clockwise"></i>
+                        {getLangText(i18n.language)} <i className="bi bi-arrow-clockwise"></i>
                         </div>
                     </button>
                     <button

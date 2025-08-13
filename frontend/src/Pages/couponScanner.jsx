@@ -5,14 +5,16 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useTranslation } from 'react-i18next';
 
-const QRScanner = () => {
+const CouponScanner = () => {
   const [scanResult, setScanResult] = useState('');
   const [error, setError] = useState(null);
+  const [successResult, setSuccessResult] = useState(null);
   const [couponStatus, setCouponStatus] = useState(null);
   const [videoDevices, setVideoDevices] = useState([]);
   const [currentDeviceIndex, setCurrentDeviceIndex] = useState(1);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
+  const codeReaderRef = useRef(null);
 
   const { t } = useTranslation();
 
@@ -63,6 +65,7 @@ const QRScanner = () => {
             if (result) {
               handleScan(result.getText());
               setError(null);
+              try { codeReaderRef.current?.reset(); } catch {}
             }
           });
         }
@@ -75,12 +78,19 @@ const QRScanner = () => {
     initScanner();
 
     return () => {
+      try { codeReaderRef.current?.reset(); } catch {}
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDeviceIndex]);
+
+  useEffect(() => {
+    if (couponStatus?.status === 'valid') {
+      setSuccessResult(couponStatus);
+    }
+  }, [couponStatus]);
 
   const handleScan = async (data) => {
     if (!data) return;
@@ -102,6 +112,7 @@ const QRScanner = () => {
     try {
       const response = await axios.post(`${BACKEND_API}/use-coupon`, { hash: scanResult, username });
       setCouponStatus(response.data);
+      setSuccessResult(null);
     } catch (error) {
       console.error('Fail to use:', `tried to connect ${BACKEND_API}/use-coupon`, error);
       alert(t("scan.userr"));
@@ -137,33 +148,10 @@ const QRScanner = () => {
   const renderCouponDetails = () => {
     if (!couponStatus) return null;
 
-    if (couponStatus.status === 'valid') {
-      return (
-        <>
-          <p className="text-green-500 mt-2 text-lg">{couponStatus.title}</p>
-          <p className="text-gray-500 mt-1 text-sm max-h-[75px] overflow-y-auto">
-            {couponStatus.description}
-          </p>
-          <div className="mt-4 flex justify-center gap-4">
-            <button
-              onClick={() => setScanResult('')}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-            >
-              {t("scan.rescan")}
-            </button>
-
-            <button
-              onClick={handleConfirmUse}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              {t("scan.confirm")}
-            </button>
-          </div>
-        </>
-      );
-    }
-
-    return <p className="text-red-500 mt-2">{couponStatus.message}</p>;
+    return <p className={`${couponStatus.status === 'valid' || couponStatus.status === 'done' 
+                            ? "text-green-600" : "text-red-500"} mt-2`}>
+            {couponStatus.message}
+          </p>;
   };
 
   return (
@@ -201,8 +189,39 @@ const QRScanner = () => {
       >
         {t("scan.switch_cam")}
       </button>
+
+      {/* Success coupon display Modal */}
+      {successResult && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative animate-fade-in">
+            <button
+              onClick={() => {setSuccessResult(null); setScanResult('');}}
+              className="absolute top-4 right-4 text-gray-500 text-xl"
+            ><i className="bi bi-x-lg"></i></button>
+            <p className="text-green-500 mt-2 text-lg">{couponStatus.title}</p>
+            <p className="text-gray-500 mt-1 text-sm max-h-[150px] overflow-y-auto">
+              {couponStatus.description}
+            </p>
+            <div className="mt-4 flex justify-center gap-4">
+              <button
+                onClick={() => {setSuccessResult(null); setScanResult('');}}
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              >
+                {t("scan.rescan")}
+              </button>
+
+              <button
+                onClick={handleConfirmUse}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
+                {t("scan.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default QRScanner;
+export default CouponScanner;

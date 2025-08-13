@@ -295,7 +295,7 @@ const MembershipManagement = () => {
           <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 max-w-md max-h-[90vh] w-full overflow-auto animate-zoom-in z-50">
             <div className="flex justify-between items-center border-b pb-2 mb-4">
               <h2 className="text-xl font-bold text-center w-full">{t("member.detail")}</h2>
-              <button onClick={closeDetails} className="text-gray-500 text-xl absolute top-4 right-4"><i class="bi bi-x-lg"></i></button>
+              <button onClick={closeDetails} className="text-gray-500 text-xl absolute top-4 right-4"><i className="bi bi-x-lg"></i></button>
             </div>
 
             <p><strong>{t("member.name")}:</strong> {memberData.UserName ? memberData.UserName : memberData.Name}</p>
@@ -336,7 +336,7 @@ const MembershipManagement = () => {
               <button
                 onClick={() => setShowFreeUseModal(false)}
                 className="absolute top-4 right-4 text-gray-500 text-xl"
-              ><i class="bi bi-x-lg"></i></button>
+              ><i className="bi bi-x-lg"></i></button>
               <h2 className="text-xl font-bold mb-4">{t("member.direct")}</h2>
 
               <div className="mb-3 text-left">
@@ -418,7 +418,7 @@ const MembershipManagement = () => {
               <button
                 onClick={() => setShowConfirmModal(false)}
                 className="absolute top-4 right-4 text-gray-500 text-xl"
-              ><i class="bi bi-x-lg"></i></button>
+              ><i className="bi bi-x-lg"></i></button>
               <h2 className="text-lg font-bold mb-4 text-center">
                 {t("member.final_conf")}
               </h2>
