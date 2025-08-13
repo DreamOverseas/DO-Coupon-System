@@ -193,6 +193,7 @@ app.post('/validate-coupon', async (req, res) => {
       status: 'valid',
       message: 'Coupon is valid.',
       title: coupon.Title,
+      uses_left: coupon.UsesLeft,
       description: coupon.Description
     });
   } catch (error) {
@@ -295,7 +296,7 @@ app.post('/use-coupon', async (req, res) => {
     );
 
     logSuccess(200, `[CouponSys] Coupon used successfully for ${coupon.title}`);
-    res.json({ message: '优惠券使用成功，并记录到用户历史！' });
+    res.json({ status: 'done' , message: '优惠券使用成功，并记录到用户历史！' });
   } catch (error) {
     console.error('Error using coupon:', error.message);
     res.status(500).json({ message: '服务器错误' });
