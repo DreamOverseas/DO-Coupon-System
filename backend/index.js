@@ -290,7 +290,7 @@ app.post('/use-coupon', async (req, res) => {
     // Step 4: Add a new entry to ConsumptionRecord
     const newRecord = {
       Consumer: coupon.AssignedTo,
-      Provider: coupon.AssignedFrom.data.Name,
+      Provider: coupon.AssignedFrom.Name,
       Platform: 'CouponSystem',
       Time: new Date().toISOString(), 
       Amount: 1,
@@ -309,7 +309,7 @@ app.post('/use-coupon', async (req, res) => {
       }
     );
 
-    logSuccess(200, `[CouponSys] Coupon used successfully for ${coupon.title}`);
+    logSuccess(200, `[CouponSys] Coupon used successfully for ${coupon.Title}`);
     res.json({ status: 'done' , message: '优惠券使用成功，并记录到用户历史！' });
   } catch (error) {
     console.error('Error using coupon:', error.message);
@@ -323,6 +323,7 @@ app.post('/use-coupon', async (req, res) => {
  * @params description -> short description for the coupon
  * @params expiry -> the exp date in yyyy-MM-dd
  * @params uses_left -> how many times this coupon can scan
+ * @params type -> Type field (enum) in the coupon (like 'NetRed' etc)
  * @params assigned_from -> who provides good/service with this coupon
  * @params assigned_to -> who owns this coupon
  * @returns couponStatus -> the status of created coupon; 'active' if successful
@@ -330,7 +331,7 @@ app.post('/use-coupon', async (req, res) => {
  * @returns message -> natrual language describing situation for debugging and more
  */
 app.post('/create-active-coupon', async (req, res) => {
-  const { title, description, expiry, uses_left, assigned_from, assigned_to, email, contact } = req.body;
+  const { title, description, expiry, uses_left, assigned_from, assigned_to, email, contact, type } = req.body;
 
   if (!title || !expiry || !assigned_from || !assigned_to) {
     return res.status(400).json({
@@ -375,6 +376,7 @@ app.post('/create-active-coupon', async (req, res) => {
         Hash: crypto.randomBytes(16).toString('hex'),
         Email: email,
         Contact: contact,
+        Type: type,
       }
     };
 
