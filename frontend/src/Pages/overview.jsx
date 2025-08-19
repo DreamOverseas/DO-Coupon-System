@@ -23,11 +23,15 @@ const Overview = () => {
     const fetchCoupons = async () => {
       try {
         const response = await axios.get(
-          `${API_ENDPOINT}/coupons?filters[AssignedFrom][$eq]=${username}`,
+          `${API_ENDPOINT}/coupons`,
           {
             headers: {
               Authorization: `Bearer ${API_KEY}`,
             },
+            params: {
+              'filters[AssignedFrom][Name][$eq]': username,
+              'populate': 'AssignedFrom'
+            }
           }
         );
         const fetchedCoupons = response.data.data.map((item) => ({

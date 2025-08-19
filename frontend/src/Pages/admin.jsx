@@ -26,6 +26,9 @@ const CouponPage = () => {
         const response = await axios.get(`${API_ENDPOINT}/coupons`, {
           headers: {
             Authorization: `Bearer ${API_KEY}`
+          },
+          params: {
+            'populate': 'AssignedFrom'
           }
         });
         setCoupons(response.data.data);
@@ -46,7 +49,7 @@ const CouponPage = () => {
       const matchesSearch =
         coupon.Title.toLowerCase().includes(lowerSearchTerm) ||
         coupon.AssignedTo.toLowerCase().includes(lowerSearchTerm) ||
-        coupon.AssignedFrom.toLowerCase().includes(lowerSearchTerm);
+        coupon.AssignedFrom.data.Name.toLowerCase().includes(lowerSearchTerm);
 
       const matchesActive = showActiveOnly ? coupon.Active : true;
 
@@ -234,7 +237,7 @@ const CouponPage = () => {
             </div>
             <hr className="my-2" />
             <div className="flex justify-between items-center">
-              <span>{coupon.AssignedFrom}</span>
+              <span>{coupon.AssignedFrom.Name}</span>
               <span className="text-xl">→</span>
               <span>{coupon.AssignedTo}</span>
             </div>
