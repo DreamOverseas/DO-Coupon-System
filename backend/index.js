@@ -51,8 +51,12 @@ const getAllCoupons = async (username) => {
     }
 
     // Send request to backend with AssignedFrom filter
-    const response = await axios.get(`${STRAPI_API}/coupons?filters[AssignedFrom][$eq]=${username}`, {
+    const response = await axios.get(`${STRAPI_API}/coupons`, {
       headers: { Authorization: `Bearer ${STRAPI_KEY}` },
+      params: {
+        'filters[AssignedFrom][Name][$eq]': username,
+        'populate': 'AssignedFrom'
+      }
     });
 
     // Return filtered coupons data
@@ -161,8 +165,13 @@ app.post('/validate-coupon', async (req, res) => {
 
   try {
     // Send request to backend with Hash filter
-    const response = await axios.get(`${STRAPI_API}/coupons?filters[Hash][$eq]=${hash}&filters[AssignedFrom][$eq]=${provider}`, {
+    const response = await axios.get(`${STRAPI_API}/coupons`, {
       headers: { Authorization: `Bearer ${STRAPI_KEY}` },
+      params: {
+        'filters[Hash][$eq]': hash,
+        'filters[AssignedFrom][Name][$eq]': provider,
+        'populate': 'AssignedFrom'
+      }
     });
 
     const coupon = response.data?.data[0];
@@ -217,8 +226,13 @@ app.post('/use-coupon', async (req, res) => {
 
   try {
     // Send request to backend with Hash filter
-    const response = await axios.get(`${STRAPI_API}/coupons?filters[Hash][$eq]=${hash}&filters[AssignedFrom][$eq]=${username}`, {
+    const response = await axios.get(`${STRAPI_API}/coupons`, {
       headers: { Authorization: `Bearer ${STRAPI_KEY}` },
+      params: {
+        'filters[Hash][$eq]': hash,
+        'filters[AssignedFrom][Name][$eq]': username,
+        'populate': 'AssignedFrom'
+      }
     });
 
     const couponData = response.data?.data[0];
@@ -276,7 +290,7 @@ app.post('/use-coupon', async (req, res) => {
     // Step 4: Add a new entry to ConsumptionRecord
     const newRecord = {
       Consumer: coupon.AssignedTo,
-      Provider: coupon.AssignedFrom,
+      Provider: coupon.AssignedFrom.data.Name,
       Platform: 'CouponSystem',
       Time: new Date().toISOString(), 
       Amount: 1,
@@ -318,26 +332,52 @@ app.post('/use-coupon', async (req, res) => {
 app.post('/create-active-coupon', async (req, res) => {
   const { title, description, expiry, uses_left, assigned_from, assigned_to, email, contact } = req.body;
 
-  if (!title || !expiry || !assigned_from || !assigned_to){
-    return res.status(400).json({ couponStatus: 'fail', message: 'Title, Expiry Date, assigning info are nessesary.' });
+  if (!title || !expiry || !assigned_from || !assigned_to) {
+    return res.status(400).json({
+      couponStatus: 'fail',
+      message: 'Title, Expiry Date, assigning info are nessesary.'
+    });
   }
 
-  const couponData = {
-    data: {
-      Title: title,
-      Description: description || '',
-      Expiry: expiry,
-      AssignedFrom: assigned_from,
-      AssignedTo: assigned_to,
-      Active: true,
-      UsesLeft: uses_left || 1,
-      Hash: crypto.randomBytes(16).toString('hex'),
-      Email: email,
-      Contact: contact
-    }
-  };
-
   try {
+    const providerResp = await fetch(
+      `${STRAPI_API}/coupon-sys-accounts?filters[Name][$eq]=${encodeURIComponent(assigned_from)}&pagination[pageSize]=1&fields[0]=Name`,
+      { headers: { 'Authorization': `Bearer ${STRAPI_KEY}` } }
+    );
+
+    if (!providerResp.ok) {
+      const errDetail = await providerResp.text().catch(() => '');
+      return res.status(providerResp.status).json({
+        couponStatus: 'fail',
+        message: `校验提供者失败：${errDetail || 'Strapi 查询出错'}`
+      });
+    }
+
+    const providerJson = await providerResp.json();
+    const provider = providerJson?.data?.[0];
+
+    if (!provider) {
+      return res.status(400).json({
+        couponStatus: 'fail',
+        message: '此提供者不存在'
+      });
+    }
+
+    const couponData = {
+      data: {
+        Title: title,
+        Description: description || '',
+        Expiry: expiry,
+        AssignedFrom: provider.documentId,   // <- On-to-One short form
+        AssignedTo: assigned_to,
+        Active: true,
+        UsesLeft: uses_left || 1,
+        Hash: crypto.randomBytes(16).toString('hex'),
+        Email: email,
+        Contact: contact,
+      }
+    };
+
     const strapiResponse = await fetch(`${STRAPI_API}/coupons`, {
       method: 'POST',
       headers: {
@@ -352,7 +392,7 @@ app.post('/create-active-coupon', async (req, res) => {
     if (!strapiResponse.ok) {
       return res.status(strapiResponse.status).json({
         couponStatus: 'fail',
-        message: strapiResult.error?.message || 'Failed to create coupon in Strapi.'
+        message: strapiResult?.error?.message || 'Failed to create coupon in Strapi.'
       });
     }
 
@@ -369,7 +409,6 @@ app.post('/create-active-coupon', async (req, res) => {
     });
   }
 });
-
 
 /**
  * This is the API designed for the Coupon System frontend, to use Coupon by its Hash code from the provider's QR scan
