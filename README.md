@@ -11,7 +11,7 @@ A lightweight coupon creation and management UI backed by Strapi. The project pr
 * [Overview](#overview)
 * [Frontend at a Glance](#frontend-at-a-glance)
 * [Tech Stack](#tech-stack)
-* [Backend API](#backend-api)
+* Backend API
 
   * [/create-active-coupon](#create-active-coupon)
   * [Environment Variables](#environment-variables)
@@ -57,7 +57,7 @@ The UI focuses on operational efficiency and clarity.
 * **Backend (integration):** Node.js + Express (proxying to **Strapi**)
 * **Data:** Strapi (v5 collection type: `coupons`)
 
-## Backend API （Public use）
+## Backend API (Public use)
 
 This repository exposes a single integration endpoint that **creates an active coupon** in Strapi and returns the **QR hash**.
 
@@ -76,11 +76,11 @@ This repository exposes a single integration endpoint that **creates an active c
 | `expiry`        | string (yyyy-MM-dd) | ✅        | Expiration date → maps to `Expiry`                              |
 | `uses_left`     | number              | ❌        | Times this coupon can be used, default `1` → maps to `UsesLeft` |
 | `type`          | string (enum)       | ❌        | E.g. `NetRed` → maps to `Type`                                  |
-| `assigned_from` | string              | ✅        | Provider Document ID → maps to `AssignedFrom`                   |
+| `assigned_from` | string              | ✅        | Provider Document ID → maps to `AssignedFrom`, Also a Name (from coupon-sys-account) could be passed in |
 | `assigned_to`   | string              | ✅        | Displayed owner name → maps to `AssignedTo`                     |
 | `email`         | string              | ❌        | Owner email → maps to `Email`                                   |
 | `contact`       | string              | ❌        | Owner contact → maps to `Contact`                               |
-| `user`          | string              | ✅        | Strapi `users_permissions_user` document ID (relationship)      |
+| `user`          | string              | ✅        | Strapi `users_permissions_user` document ID (relationship only)  |
 
 **Success Response**
 
@@ -123,7 +123,7 @@ curl -X POST https://<your-host>/create-active-coupon \
     "expiry": "2025-12-31",
     "uses_left": 1,
     "type": "NetRed",
-    "assigned_from": <document_id>,
+    "assigned_from": <document_id> | "ExampleName",
     "assigned_to": "Alice Zhang",
     "email": "alice@example.com",
     "contact": "+61 400 000 000",
