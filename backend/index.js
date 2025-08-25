@@ -334,7 +334,7 @@ app.post('/use-coupon', async (req, res) => {
 app.post('/create-active-coupon', async (req, res) => {
   const { title, description, expiry, uses_left, assigned_from, assigned_to, email, contact, type, user } = req.body;
 
-  if (!title || !expiry || !assigned_from || !assigned_to || !user) {
+  if (!title || !expiry || !assigned_from || !assigned_to) {
     return res.status(400).json({
       couponStatus: 'fail',
       message: 'Title, Expiry Date, assigning info (including display and relations) are nessesary.'

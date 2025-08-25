@@ -80,7 +80,7 @@ This repository exposes a single integration endpoint that **creates an active c
 | `assigned_to`   | string              | ✅        | Displayed owner name → maps to `AssignedTo`                     |
 | `email`         | string              | ❌        | Owner email → maps to `Email`                                   |
 | `contact`       | string              | ❌        | Owner contact → maps to `Contact`                               |
-| `user`          | string              | ✅        | Strapi `users_permissions_user` document ID (relationship only)  |
+| `user`          | string              | ❌        | Strapi `users_permissions_user` document ID (relationship only), used for WHDS  |
 
 **Success Response**
 
@@ -141,7 +141,7 @@ curl -X POST https://<your-host>/create-active-coupon \
 }
 ```
 
-**400** (example)
+**400** (example - when nessesary field not passed-in)
 
 ```json
 {
