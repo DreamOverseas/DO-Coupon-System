@@ -324,52 +324,30 @@ app.post('/use-coupon', async (req, res) => {
  * @params expiry -> the exp date in yyyy-MM-dd
  * @params uses_left -> how many times this coupon can scan
  * @params type -> Type field (enum) in the coupon (like 'NetRed' etc)
- * @params assigned_from -> who provides good/service with this coupon
- * @params assigned_to -> who owns this coupon
+ * @params assigned_from -> who provides good/service with this coupon (Document ID)
+ * @params assigned_to -> who owns this coupon (Diaplay)
+ * @params user -> who owns this coupon (Relationship, pass in user's document ID)
  * @returns couponStatus -> the status of created coupon; 'active' if successful
  * @returns QRdata -> the hash needed for creating QR Code, get from successful creation
  * @returns message -> natrual language describing situation for debugging and more
  */
 app.post('/create-active-coupon', async (req, res) => {
-  const { title, description, expiry, uses_left, assigned_from, assigned_to, email, contact, type } = req.body;
+  const { title, description, expiry, uses_left, assigned_from, assigned_to, email, contact, type, user } = req.body;
 
-  if (!title || !expiry || !assigned_from || !assigned_to) {
+  if (!title || !expiry || !assigned_from || !assigned_to || !user) {
     return res.status(400).json({
       couponStatus: 'fail',
-      message: 'Title, Expiry Date, assigning info are nessesary.'
+      message: 'Title, Expiry Date, assigning info （including display and relations） are nessesary.'
     });
   }
 
   try {
-    const providerResp = await fetch(
-      `${STRAPI_API}/coupon-sys-accounts?filters[Name][$eq]=${encodeURIComponent(assigned_from)}&pagination[pageSize]=1&fields[0]=Name`,
-      { headers: { 'Authorization': `Bearer ${STRAPI_KEY}` } }
-    );
-
-    if (!providerResp.ok) {
-      const errDetail = await providerResp.text().catch(() => '');
-      return res.status(providerResp.status).json({
-        couponStatus: 'fail',
-        message: `校验提供者失败：${errDetail || 'Strapi 查询出错'}`
-      });
-    }
-
-    const providerJson = await providerResp.json();
-    const provider = providerJson?.data?.[0];
-
-    if (!provider) {
-      return res.status(400).json({
-        couponStatus: 'fail',
-        message: '此提供者不存在'
-      });
-    }
-
     const couponData = {
       data: {
         Title: title,
         Description: description || '',
         Expiry: expiry,
-        AssignedFrom: provider.documentId,   // <- On-to-One short form
+        AssignedFrom: assigned_from,
         AssignedTo: assigned_to,
         Active: true,
         UsesLeft: uses_left || 1,
@@ -377,6 +355,7 @@ app.post('/create-active-coupon', async (req, res) => {
         Email: email,
         Contact: contact,
         Type: type,
+        users_permissions_user: user
       }
     };
 
