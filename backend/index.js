@@ -250,6 +250,7 @@ app.post('/use-coupon', async (req, res) => {
     const coupon = couponData;
 
     const updatedUsesLeft = coupon.UsesLeft - 1;
+    const updatedScannedTimes = coupon.Scanned + 1;
 
     // Update the coupon's UsesLeft and Active status
     await axios.put(
@@ -258,6 +259,7 @@ app.post('/use-coupon', async (req, res) => {
         data: {
           UsesLeft: updatedUsesLeft,
           Active: updatedUsesLeft <= 0 ? false : coupon.Active,
+          Scanned: updatedScannedTimes
         },
       },
       {
@@ -332,7 +334,7 @@ app.post('/use-coupon', async (req, res) => {
  * @returns message -> natrual language describing situation for debugging and more
  */
 app.post('/create-active-coupon', async (req, res) => {
-  const { title, description, expiry, uses_left, assigned_from, assigned_to, email, contact, type, user } = req.body;
+  const { title, description, expiry, uses_left, assigned_from, assigned_to, email, contact, type, user, hide } = req.body;
 
   if (!title || !expiry || !assigned_from || !assigned_to) {
     return res.status(400).json({
@@ -384,7 +386,9 @@ app.post('/create-active-coupon', async (req, res) => {
         Email: email,
         Contact: contact,
         Type: type,
-        users_permissions_user: user
+        users_permissions_user: user,
+        Hide: hide ? hide : false,
+        Scanned: 0
       }
     };
 

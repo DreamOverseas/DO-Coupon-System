@@ -128,6 +128,7 @@ curl -X POST https://<your-host>/create-active-coupon \
     "email": "alice@example.com",
     "contact": "+61 400 000 000",
     "user": <document_id>
+    "hide": false
   }'
 ```
 
