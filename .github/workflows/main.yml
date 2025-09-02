@@ -1,0 +1,38 @@
+name: Deploy service on main branch updates
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout (for completeness; not strictly required)
+        uses: actions/checkout@v4
+
+      - name: Run deploy shell commands on server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}            # Server IP
+          username: ${{ secrets.SSH_USER }}        # username
+          key: ${{ secrets.SSH_PRIVATE_KEY }}      # SSH Secret (key pair)
+          script_stop: true                        # Stop for any error
+          command_timeout: 10m
+          # Actual WORKDIR
+          script: |
+            set -euo pipefail
+            cd /home/ecs-user/DO-Coupon-System
+            echo "[INFO] Current dir: $(pwd)"
+            # permission granting
+            chmod +x ./deploy.sh
+            # run as non-interactive, catches every error
+            ./deploy.sh
