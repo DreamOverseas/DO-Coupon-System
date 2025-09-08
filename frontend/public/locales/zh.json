@@ -18,7 +18,6 @@
     "overview": {
         "nothing": "暂无卡券数据",
         "assignto": "签发给",
-        "useleft": "剩余次数",
         "exp": "到期日",
         "onlyactive": "仅显示可用卡券",
         "search": "搜索卡券..."

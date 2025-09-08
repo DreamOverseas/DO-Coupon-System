@@ -18,7 +18,6 @@
     "overview": {
         "nothing": "Cannot find any Coupon data",
         "assignto": "Assigned to",
-        "useleft": "Uses Left",
         "exp": "Expiry",
         "onlyactive": "Show Active Only",
         "search": "Search Coupon..."

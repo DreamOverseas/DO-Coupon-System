@@ -127,7 +127,7 @@ const Overview = () => {
               </div>
               <hr className="my-2" />
               <div className="flex justify-between items-center">
-                <p className="text-sm text-gray-700">{t("overview.useleft")}: {coupon.UsesLeft}</p>
+                <p className="text-sm font-semibold text-gray-700"><i className="bi bi-ticket-detailed mr-2"> {coupon.UsesLeft}</i> <i className="bi bi-hr"> {coupon.Scanned}</i></p>
                 <p className="text-sm text-gray-700">{t("overview.exp")}: {coupon.Expiry}</p>
               </div>
             </div>
