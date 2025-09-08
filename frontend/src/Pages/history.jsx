@@ -47,8 +47,16 @@ const History = () => {
   useEffect(() => {
     const filtered = records.filter(
       (record) =>
-        record.Consumer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        record.AdditionalInfo.toLowerCase().includes(searchTerm.toLowerCase())
+        (
+          record.Consumer &&
+          record.Consumer.trim() !== '' &&
+          record.Consumer.toLowerCase().includes(searchTerm.toLowerCase())
+        ) ||
+        (
+          record.AdditionalInfo &&
+          record.AdditionalInfo.trim() !== '' &&
+          record.AdditionalInfo.toLowerCase().includes(searchTerm.toLowerCase())
+        )
     );
     setFilteredRecords(filtered);
   }, [searchTerm, records]);
