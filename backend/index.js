@@ -334,7 +334,7 @@ app.post('/use-coupon', async (req, res) => {
  * @returns message -> natrual language describing situation for debugging and more
  */
 app.post('/create-active-coupon', async (req, res) => {
-  const { title, description, expiry, uses_left, assigned_from, assigned_to, email, contact, type, user, hide } = req.body;
+  const { title, description, expiry, uses_left, assigned_from, assigned_to, email, contact, type, user, hide, value } = req.body;
 
   if (!title || !expiry || !assigned_from || !assigned_to) {
     return res.status(400).json({
@@ -388,7 +388,8 @@ app.post('/create-active-coupon', async (req, res) => {
         Type: type,
         users_permissions_user: user,
         Hide: hide ? hide : false,
-        Scanned: 0
+        Scanned: 0,
+        Value: value ? value : 0
       }
     };
 
