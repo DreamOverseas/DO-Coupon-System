@@ -412,9 +412,11 @@ app.post('/create-active-coupon', async (req, res) => {
     }
 
     const hash = strapiResult?.data?.Hash;
+    const dID = strapiResult?.data?.documentId;
     return res.status(201).json({
       couponStatus: 'active',
       QRdata: hash,
+      cid: dID,     // c(oupon)ID is its d(ocument)ID
       message: 'Coupon created successfully.'
     });
   } catch (error) {
