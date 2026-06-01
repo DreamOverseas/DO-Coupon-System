@@ -72,7 +72,7 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col h-screen overflow-hidden">
             {/* Top info bar */}
             <header className="bg-gray-800 text-white py-4 px-6 flex items-center justify-between shadow-md">
                 <div className="flex items-center space-x-4">
@@ -98,11 +98,12 @@ const Dashboard = () => {
             </header>
 
             {/* Main contents */}
-            <main className="flex-1 bg-gray-100">{renderContent()}</main>
-            <br/><br/>
+            <main className="flex-1 overflow-y-auto bg-gray-100 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
+                {renderContent()}
+            </main>
 
             {/* Nav Bar-ttom */}
-            <footer className="fixed bottom-0 w-full bg-gray-800 text-white py-2 px-4 flex justify-around items-center shadow-md z-50">
+            <footer className="fixed bottom-0 w-full bg-gray-800 text-white py-2 px-4 flex justify-around items-center shadow-md z-30" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
                 <button
                     className="flex flex-col items-center text-xs focus:outline-none"
                     onClick={() => setActiveTab('overview')}

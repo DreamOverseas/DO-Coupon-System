@@ -23,8 +23,8 @@ const MembershipManagement = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState(false);
 
-  const [totalAmount, setTotalAmount] = useState(null);
-  const [deduction, setDeduction] = useState(null);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [deduction, setDeduction] = useState(0);
   const [purpose, setPurpose] = useState('');
 
   const videoRef = useRef(null);
@@ -33,9 +33,24 @@ const MembershipManagement = () => {
 
   const { t } = useTranslation();
 
+  const normalizeNonNegativeNumber = (value) => {
+    const parsed = Number(value);
+    if (Number.isNaN(parsed) || parsed < 0) return 0;
+    return parsed;
+  };
+
+  const availablePointForDeduction = Math.min(totalAmount, memberData?.DiscountPoint ?? 0);
+  const cashAmount = Math.max(totalAmount - deduction, 0);
+
   const isInvalidBalance = memberData && (
     memberData.DiscountPoint - deduction < 0 ||
     memberData.Point - totalAmount + deduction < 0);
+
+  useEffect(() => {
+    if (deduction > availablePointForDeduction) {
+      setDeduction(availablePointForDeduction);
+    }
+  }, [availablePointForDeduction, deduction]);
 
   useEffect(() => {
     const initScanner = async () => {
@@ -159,11 +174,6 @@ const MembershipManagement = () => {
     restartScanner();
   };
 
-  const handleDefaultDeduction = () => {
-    const half = Math.floor(totalAmount / 2);
-    setDeduction(Math.min(half, memberData.DiscountPoint));
-  };
-
   const handleFinalSubmit = async () => {
     setIsLoading(true);
     try {
@@ -207,7 +217,7 @@ const MembershipManagement = () => {
         account: Cookies.get('username'),
         member_name: memberData.UserName ? memberData.UserName : memberData.Name,
         member_email: memberData.Email,
-        notes: `${purpose}（Discounted: ${deduction}）`
+        notes: `${purpose}（Point used: ${deduction} | Cash: ${cashAmount}）`
       });
 
       setSuccessMsg(true);
@@ -301,6 +311,7 @@ const MembershipManagement = () => {
             <p><strong>{t("member.name")}:</strong> {memberData.UserName ? memberData.UserName : memberData.Name}</p>
             <p><strong>{t("member.number")}:</strong> {memberData.MembershipNumber}</p>
             <p><strong>{t("member.email")}:</strong> {memberData.Email}</p>
+            <p><strong>{t("member.class")}:</strong> {memberData.MembershipClass || '-'}</p>
             <p><strong>{t("member.exp")}:</strong> {memberData.ExpiryDate}</p>
             <p><strong>{t("member.point")}:</strong> {memberData.Point} + {memberData.DiscountPoint}</p>
 
@@ -354,7 +365,11 @@ const MembershipManagement = () => {
                 <input
                   type="number"
                   value={totalAmount}
-                  onChange={(e) => setTotalAmount(Number(e.target.value))}
+                  onChange={(e) => {
+                    const nextTotal = normalizeNonNegativeNumber(e.target.value);
+                    setTotalAmount(nextTotal);
+                    setDeduction((current) => Math.min(current, Math.min(nextTotal, memberData.DiscountPoint)));
+                  }}
                   max={memberData.Point + memberData.DiscountPoint}
                   min={0}
                   className="w-full border rounded px-3 py-2 mt-1"
@@ -367,14 +382,29 @@ const MembershipManagement = () => {
                   <input
                     type="number"
                     value={deduction}
-                    onChange={(e) => setDeduction(Number(e.target.value))}
-                    max={memberData.DiscountPoint}
+                    onChange={(e) => {
+                      const inputDeduction = normalizeNonNegativeNumber(e.target.value);
+                      setDeduction(Math.min(inputDeduction, availablePointForDeduction));
+                    }}
+                    max={availablePointForDeduction}
                     min={0}
                     className="w-full border rounded px-3 py-2 mt-1"
                   />
-                  <button className="bg-black text-white min-w-16 min-h-10 text-sm px-2 py-1 rounded mt-1" onClick={handleDefaultDeduction}>
-                    {t("member.def")}
-                  </button>
+                </div>
+                <div className="mt-3">
+                  <div className="flex justify-between text-xs text-gray-500 mb-1">
+                    <span>{t("member.cash")}: {cashAmount}</span>
+                    <span>{t("member.deduction")}: {deduction}</span>
+                  </div>
+                  <input
+                    type="range"
+                    value={deduction}
+                    min={0}
+                    max={availablePointForDeduction}
+                    step={1}
+                    onChange={(e) => setDeduction(Number(e.target.value))}
+                    className="w-full"
+                  />
                 </div>
               </div>
 
@@ -426,6 +456,10 @@ const MembershipManagement = () => {
                 <p><strong>{t("member.name")}:</strong> {memberData.UserName ? memberData.UserName : memberData.Name}</p>
                 <p><strong>{t("member.number")}:</strong> {memberData.MembershipNumber}</p>
                 <p><strong>{t("member.email")}:</strong> {memberData.Email}</p>
+                <p><strong>{t("member.class")}:</strong> {memberData.MembershipClass || '-'}</p>
+                <p><strong>{t("member.total")}:</strong> {totalAmount}</p>
+                <p><strong>{t("member.deduction")}:</strong> {deduction}</p>
+                <p><strong>{t("member.cash")}:</strong> {cashAmount}</p>
                 <p><strong>{t("member.point")}:</strong> {memberData.Point + memberData.DiscountPoint} → {memberData.Point + memberData.DiscountPoint - totalAmount}</p>
                 <p><strong> &gt; {t("member.balance")}:</strong> {memberData.Point} → {memberData.Point - totalAmount + deduction}</p>
                 <p><strong> &gt; {t("member.disc_p")}:</strong> {memberData.DiscountPoint} → {memberData.DiscountPoint - deduction}</p>
