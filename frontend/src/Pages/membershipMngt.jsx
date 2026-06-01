@@ -33,6 +33,12 @@ const MembershipManagement = () => {
 
   const { t } = useTranslation();
 
+  const toNumber = (value) => {
+    const parsed = Number(value);
+    if (Number.isNaN(parsed) || parsed < 0) return 0;
+    return parsed;
+  };
+
   const normalizeNonNegativeNumber = (value) => {
     const parsed = Number(value);
     if (Number.isNaN(parsed) || parsed < 0) return 0;
@@ -59,6 +65,12 @@ const MembershipManagement = () => {
       codeReaderRef.current = new BrowserMultiFormatReader(hints);
 
       try {
+        // Request camera permission first so the browser can expose available devices reliably.
+        const permissionStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' },
+        });
+        permissionStream.getTracks().forEach((track) => track.stop());
+
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoInputDevices = devices.filter(d => d.kind === 'videoinput');
         setVideoDevices(videoInputDevices);
@@ -107,7 +119,7 @@ const MembershipManagement = () => {
     setScanResult(data);
 
     try {
-      const res = await axios.get(`${API_ENDPOINT}/${MembershipField}?filters[MembershipNumber][$eq]=${scanResult}`, {
+      const res = await axios.get(`${API_ENDPOINT}/${MembershipField}?filters[MembershipNumber][$eq]=${encodeURIComponent(data)}`, {
         headers: { Authorization: `Bearer ${API_KEY}` },
         params: {
           filters: {
@@ -177,33 +189,17 @@ const MembershipManagement = () => {
   const handleFinalSubmit = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.get(`${API_ENDPOINT}/${MembershipField}?filters[Email][$eq]=${memberData.Email}`, {
-        headers: { Authorization: `Bearer ${API_KEY}` },
-        params: {
-          filters: {
-            Email: {
-              $eq: memberData.Email
-            }
-          }
-        }
-      });
+      if (!memberData?.documentId) throw new Error(t("member.nounique"));
 
-      const match = res.data?.data;
-      if (!match || match.length !== 1) throw new Error(t("member.nounique"));
-
-      const memberID = match[0].documentId;
-      const currentPoints = match[0].Point;
-      const currentDiscount = match[0].DiscountPoint;
+      const memberID = memberData.documentId;
+      const currentPoints = toNumber(memberData.Point);
+      const currentDiscount = toNumber(memberData.DiscountPoint);
 
       const newPoints = currentPoints - totalAmount + deduction;
       const newDiscount = currentDiscount - deduction;
 
-      // eslint-disable-next-line no-unused-vars
-      const { id, attributes: cleanData } = match[0];
-
       await axios.put(`${API_ENDPOINT}/${MembershipField}/${memberID.trim()}`, {
         data: {
-          ...cleanData,
           Point: newPoints,
           DiscountPoint: newDiscount
         }
@@ -364,7 +360,7 @@ const MembershipManagement = () => {
                 <label className="block text-sm font-medium">{t("member.total")}</label>
                 <input
                   type="number"
-                  value={totalAmount}
+                  value={totalAmount === 0 ? '' : totalAmount}
                   onChange={(e) => {
                     const nextTotal = normalizeNonNegativeNumber(e.target.value);
                     setTotalAmount(nextTotal);
@@ -381,7 +377,7 @@ const MembershipManagement = () => {
                 <div className="flex gap-2 items-center">
                   <input
                     type="number"
-                    value={deduction}
+                    value={deduction === 0 ? '' : deduction}
                     onChange={(e) => {
                       const inputDeduction = normalizeNonNegativeNumber(e.target.value);
                       setDeduction(Math.min(inputDeduction, availablePointForDeduction));

@@ -438,7 +438,15 @@ app.post('/create-active-coupon', async (req, res) => {
 app.post('/record-md-deduction', async (req, res) => {
   const { amount, discount, account, member_name, member_email, notes } = req.body;
 
-  if (!amount || !discount) {
+  const amountNum = Number(amount);
+  const discountNum = Number(discount);
+
+  if (
+    amount === undefined || amount === null ||
+    discount === undefined || discount === null ||
+    Number.isNaN(amountNum) || Number.isNaN(discountNum) ||
+    amountNum < 0 || discountNum < 0
+  ) {
     return res.status(400).json({ message: 'How much consumed is NeSseSarY!' });
   }
 
@@ -475,7 +483,7 @@ app.post('/record-md-deduction', async (req, res) => {
       Provider: account,
       Platform: 'MembershipDirect',
       Time: new Date().toISOString(), 
-      Amount: amount,
+      Amount: amountNum,
       AdditionalInfo: notes,
     };
 
@@ -501,8 +509,8 @@ app.post('/record-md-deduction', async (req, res) => {
         name: member_name,
         email: member_email,
         account: "WCO",
-        point: amount,
-        discount: discount,
+        point: amountNum,
+        discount: discountNum,
         info: notes
       },
       { headers: {
@@ -510,7 +518,7 @@ app.post('/record-md-deduction', async (req, res) => {
       }}
     );
 
-    logSuccess(200, `[CouponSys - MembershipDirect] Consumed ${amount} successfully for ${member_name}`);
+    logSuccess(200, `[CouponSys - MembershipDirect] Consumed ${amountNum} successfully for ${member_name}`);
     res.json({ message: '成功，已记录到用户历史！' });
   } catch (error) {
     console.error('Error Ocuured - ', error);
