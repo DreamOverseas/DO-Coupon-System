@@ -14,6 +14,58 @@ const History = () => {
   const username = Cookies.get('username');
   const { t } = useTranslation();
 
+  const formatRecordDate = (time) => {
+    if (!time) return '-';
+    const date = new Date(time);
+    if (Number.isNaN(date.getTime())) return '-';
+
+    return date.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const getDateKey = (time) => {
+    if (!time) return t('history.unknownDate');
+    const date = new Date(time);
+    if (Number.isNaN(date.getTime())) return t('history.unknownDate');
+
+    return date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+  };
+
+  const parseAmount = (amount) => {
+    const parsed = Number(amount);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
+  const totalAmount = filteredRecords.reduce(
+    (sum, record) => sum + parseAmount(record.Amount),
+    0
+  );
+
+  const groupedByDate = filteredRecords.reduce((groups, record) => {
+    const dateKey = getDateKey(record.Time);
+    if (!groups[dateKey]) {
+      groups[dateKey] = {
+        records: [],
+        total: 0,
+      };
+    }
+
+    groups[dateKey].records.push(record);
+    groups[dateKey].total += parseAmount(record.Amount);
+    return groups;
+  }, {});
+
+  const groupedEntries = Object.entries(groupedByDate);
+
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -74,6 +126,11 @@ const History = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
+      <div className="mb-4 p-3 bg-white rounded shadow-sm border">
+        <p className="text-sm text-gray-500">{t('history.totalAmountLabel')}</p>
+        <p className="text-2xl font-bold text-gray-800">{totalAmount}</p>
+      </div>
+
       {/* History */}
       <div className="flex-1 overflow-y-auto bg-gray-50 p-4 rounded shadow-inner">
         {filteredRecords.length === 0 ? (
@@ -81,30 +138,56 @@ const History = () => {
             <p className="text-xl font-bold text-gray-500">{t("history.nope")}</p>
           </div>
         ) : (
-          <ul className="space-y-4">
-            {filteredRecords.map((record, index) => (
-              <li
-                key={index}
-                className="border-b pb-2 last:border-b-0 flex flex-col"
-              >
-                <div className="flex justify-between items-center">
-                  <p className="font-bold text-gray-700">{record.Consumer}</p>
-                  <p className="text-sm text-gray-500">
-                    {new Date(record.Time).toLocaleString('zh-CN', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+          <div className="space-y-6">
+            {groupedEntries.map(([date, group]) => (
+              <div key={date} className="bg-white rounded border shadow-sm p-4">
+                <div className="flex items-center justify-between border-b pb-2 mb-3">
+                  <p className="font-bold text-gray-800">{date}</p>
+                  <p className="text-sm font-semibold text-gray-700">
+                    {t('history.dailyTotalLabel')}: {group.total}
                   </p>
                 </div>
-                <p className="text-sm text-gray-600 mt-2">
-                  {record.AdditionalInfo}
-                </p>
-              </li>
+
+                <ul className="space-y-3">
+                  {group.records.map((record, index) => (
+                    <li
+                      key={`${date}-${index}`}
+                      className="rounded border p-3 bg-gray-50"
+                    >
+                      <div className="flex justify-between items-start gap-4">
+                        <div>
+                          <p className="font-semibold text-gray-800">
+                            {record.Consumer || '-'}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {formatRecordDate(record.Time)}
+                          </p>
+                        </div>
+                        <p className="text-sm font-bold text-emerald-700">
+                          {t('history.amountLabel')}: {parseAmount(record.Amount)}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-sm text-gray-700">
+                        <p>
+                          <span className="font-medium">{t('history.providerLabel')}:</span>{' '}
+                          {record.Provider || '-'}
+                        </p>
+                        <p>
+                          <span className="font-medium">{t('history.platformLabel')}:</span>{' '}
+                          {record.Platform || '-'}
+                        </p>
+                        <p className="sm:col-span-2 break-words">
+                          <span className="font-medium">{t('history.detailLabel')}:</span>{' '}
+                          {record.AdditionalInfo || '-'}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>

@@ -70,6 +70,13 @@
     "history": {
         "title": "卡券/会员消费 使用历史",
         "nope": "暂无使用记录",
-        "search": "搜索记录..."
+        "search": "搜索记录...",
+        "totalAmountLabel": "总金额",
+        "dailyTotalLabel": "当日总金额",
+        "amountLabel": "金额",
+        "providerLabel": "商户",
+        "platformLabel": "平台",
+        "detailLabel": "详细内容",
+        "unknownDate": "未知日期"
     }
 }

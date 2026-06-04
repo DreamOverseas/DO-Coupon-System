@@ -70,6 +70,13 @@
     "history": {
         "title": "Coupon / Member-Direct History",
         "nope": "No consumption records available",
-        "search": "Search Records..."
+        "search": "Search Records...",
+        "totalAmountLabel": "Total Amount",
+        "dailyTotalLabel": "Daily Total",
+        "amountLabel": "Amount",
+        "providerLabel": "Provider",
+        "platformLabel": "Platform",
+        "detailLabel": "Details",
+        "unknownDate": "Unknown Date"
     }
 }

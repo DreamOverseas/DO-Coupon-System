@@ -93,6 +93,14 @@ const logSuccess = (statusCode, message) => {
   console.log(`[CouponSys - ${statusCode} OK] ${message}.`);
 }
 
+// Normalize amount from coupon payload to avoid field-case or type issues.
+const getCouponAmount = (coupon) => {
+  const rawValue = coupon?.Value ?? coupon?.value;
+  const parsedValue = Number(rawValue);
+
+  return Number.isFinite(parsedValue) ? parsedValue : 1;
+};
+
 /**
  * This is the API designed or the Coupon System frontend main page login
  * @params name -> the name for login
@@ -231,7 +239,14 @@ app.post('/use-coupon', async (req, res) => {
       params: {
         'filters[Hash][$eq]': hash,
         'filters[AssignedFrom][Name][$eq]': username,
-        'populate': 'AssignedFrom'
+        'populate': 'AssignedFrom',
+        'fields[0]': 'Title',
+        'fields[1]': 'AssignedTo',
+        'fields[2]': 'UsesLeft',
+        'fields[3]': 'Scanned',
+        'fields[4]': 'Active',
+        'fields[5]': 'Expiry',
+        'fields[6]': 'Value'
       }
     });
 
@@ -295,7 +310,7 @@ app.post('/use-coupon', async (req, res) => {
       Provider: coupon.AssignedFrom.Name,
       Platform: 'CouponSystem',
       Time: new Date().toISOString(), 
-      Amount: 1,
+      Amount: getCouponAmount(coupon),
       AdditionalInfo: coupon.Title,
     };
 
