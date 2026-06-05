@@ -50,6 +50,8 @@ const History = () => {
     0
   );
 
+  const totalRecords = filteredRecords.length;
+
   const groupedByDate = filteredRecords.reduce((groups, record) => {
     const dateKey = getDateKey(record.Time);
     if (!groups[dateKey]) {
@@ -65,6 +67,7 @@ const History = () => {
   }, {});
 
   const groupedEntries = Object.entries(groupedByDate);
+  const latestDayTotal = groupedEntries[0]?.[1]?.total ?? 0;
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -114,25 +117,46 @@ const History = () => {
   }, [searchTerm, records]);
 
   return (
-    <div className="p-4 h-full flex flex-col">
-      <h1 className="text-2xl font-bold mb-4">{t("history.title")}</h1>
+    <div className="h-full px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-full w-full max-w-7xl flex-col gap-4">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">{t("history.title")}</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              {t('history.totalAmountLabel')} / {totalRecords} {t('history.amountLabel')}
+            </p>
+          </div>
 
-      {/* Search Inputtin' field */}
-      <input
-        type="text"
-        placeholder={t("history.search")}
-        className="border px-4 py-2 rounded mb-4 w-full max-w-md"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
+          <input
+            type="text"
+            placeholder={t("history.search")}
+            className="w-full rounded border border-gray-300 bg-white px-4 py-2 shadow-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100 lg:max-w-lg"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
 
-      <div className="mb-4 p-3 bg-white rounded shadow-sm border">
-        <p className="text-sm text-gray-500">{t('history.totalAmountLabel')}</p>
-        <p className="text-2xl font-bold text-gray-800">{totalAmount}</p>
-      </div>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="rounded border bg-white p-4 shadow-sm">
+            <p className="text-sm text-gray-500">{t('history.totalAmountLabel')}</p>
+            <p className="mt-2 text-3xl font-bold text-gray-900">{totalAmount}</p>
+          </div>
 
-      {/* History */}
-      <div className="flex-1 overflow-y-auto bg-gray-50 p-4 rounded shadow-inner">
+          <div className="rounded border bg-white p-4 shadow-sm">
+            <p className="text-sm text-gray-500">{t('history.dailyTotalLabel')}</p>
+            <p className="mt-2 text-3xl font-bold text-gray-900">{latestDayTotal}</p>
+          </div>
+
+          <div className="rounded border bg-white p-4 shadow-sm md:col-span-2 xl:col-span-1">
+            <p className="text-sm text-gray-500">{t('history.search')}</p>
+            <p className="mt-2 text-sm text-gray-700">
+              {searchTerm ? searchTerm : t('history.nope')}
+            </p>
+          </div>
+        </div>
+
+        {/* History */}
+        <div className="flex-1 overflow-y-auto rounded bg-gray-50 p-4 shadow-inner lg:p-6">
         {filteredRecords.length === 0 ? (
           <div className="text-center mt-10">
             <p className="text-xl font-bold text-gray-500">{t("history.nope")}</p>
@@ -148,11 +172,11 @@ const History = () => {
                   </p>
                 </div>
 
-                <ul className="space-y-3">
+                <ul className="grid grid-cols-1 gap-3 xl:grid-cols-2">
                   {group.records.map((record, index) => (
                     <li
                       key={`${date}-${index}`}
-                      className="rounded border p-3 bg-gray-50"
+                      className="rounded border bg-gray-50 p-3"
                     >
                       <div className="flex justify-between items-start gap-4">
                         <div>
@@ -189,6 +213,7 @@ const History = () => {
             ))}
           </div>
         )}
+        </div>
       </div>
     </div>
   );
