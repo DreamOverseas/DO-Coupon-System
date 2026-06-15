@@ -1,13 +1,13 @@
 {
     "login": {
-        "title": "DO Membership & Coupon Management System",
+        "title": "360 Membership Benefits System",
         "username": "User Name",
         "pwd": "Password",
         "loginbtn": "Login",
         "readtc": "Please read carefully our"
     },
     "dashboard": {
-        "title": "DO Coupon Client",
+        "title": "360 Membership Benefits System",
         "greet": "Welcome,",
         "logout": "Logout",
         "overview": "Coupon Overview",

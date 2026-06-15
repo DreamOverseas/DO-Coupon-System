@@ -1,13 +1,13 @@
 {
     "login": {
-        "title": "DO集团会员及核销券管理系统",
+        "title": "360会员管理系统",
         "username": "用户名",
         "pwd": "密码",
         "loginbtn": "登录",
         "readtc": "请仔细阅读我们的"
     },
     "dashboard": {
-        "title": "卡券管理客户端",
+        "title": "360会员管理系统",
         "greet": "您好,",
         "logout": "登出",
         "overview": "卡券一览",
